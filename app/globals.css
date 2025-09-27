@@ -29,4 +29,27 @@ body {
   background-color: var(--color-fx-paper);
   color: var(--color-fx-black);
   font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 500; /* Medium weight for better readability */
+}
+
+/* Make all paragraph text bolder */
+p {
+  font-weight: 500;
+  color: var(--color-fx-black); /* Use darker color instead of fx-700 */
+}
+
+/* Make headings even bolder */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--color-fx-black);
+}
+
+/* Links styling */
+a {
+  font-weight: 500;
+}
+
+/* Navigation links */
+nav a {
+  font-weight: 500;
 }
