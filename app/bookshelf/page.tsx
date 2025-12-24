@@ -43,80 +43,10 @@ export default function Bookshelf() {
           </div>
 
           <div className="flex justify-between items-center">
-            <a href="/bookshelf/sense-of-style" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Sense of Style
+            <a href="/bookshelf/atomic-habits" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
+              Atomic Habits
             </a>
-            <span className="text-fx-500 text-sm">May 2024</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/how-to-know-a-person" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              How to Know a Person
-            </a>
-            <span className="text-fx-500 text-sm">Mar 2024</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/the-creative-act" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              The Creative Act
-            </a>
-            <span className="text-fx-500 text-sm">Jan 2024</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/storyworthy" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Storyworthy *
-            </a>
-            <span className="text-fx-500 text-sm">Jan 2024</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/walter-isaacsons-elon-musk" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Walter Isaacson's Elon Musk
-            </a>
-            <span className="text-fx-500 text-sm">Oct 2023</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/the-laws-of-trading" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              The Laws of Trading
-            </a>
-            <span className="text-fx-500 text-sm">Sep 2023</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/thinking-in-systems" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Thinking in Systems
-            </a>
-            <span className="text-fx-500 text-sm">Jun 2023</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/cant-hurt-me" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Can't Hurt Me
-            </a>
-            <span className="text-fx-500 text-sm">May 2023</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/the-accidental-superpower" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              The Accidental Superpower
-            </a>
-            <span className="text-fx-500 text-sm">Jul 2020</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/cities-and-the-wealth-of-nations" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Cities and the wealth of nations
-            </a>
-            <span className="text-fx-500 text-sm">Jun 2020</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/range" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Range
-            </a>
-            <span className="text-fx-500 text-sm">May 2020</span>
+            <span className="text-fx-500 text-sm">2023</span>
           </div>
         </section>
 

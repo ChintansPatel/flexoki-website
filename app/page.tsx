@@ -17,23 +17,11 @@ export default function Home() {
         {/* About Content */}
         <section className="space-y-6">
           <p className="text-fx-700 leading-relaxed">
-            I'm Chintan, as in{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">
-              Chintan and Technology
-            </a>
-            .
+            I'm Chintan.
           </p>
 
           <p className="text-fx-700 leading-relaxed">
-            I'm currently based in Chicago. From 2020-2025, I spent most of my working 
-            hours (and a decent number of my sleeping ones) thinking about how to grow 
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors mx-1">
-              innovative solutions
-            </a>
-            along with{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">Peter</a>,{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">Ilya</a>, and{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">Ian</a>.
+            I'm currently based in Chicago.
           </p>
 
           <p className="text-fx-700 leading-relaxed">
@@ -87,68 +75,6 @@ export default function Home() {
           <p className="text-fx-700 leading-relaxed">
             <strong>Contacting Me:</strong> If you'd like to get in touch, I'm chintan@ this domain.
           </p>
-        </section>
-
-        {/* Newsletters Section */}
-        <section className="border-t border-fx-200 pt-8">
-          <h2 className="text-2xl font-semibold mb-6 text-fx-black">Newsletters</h2>
-          
-          <div className="space-y-4">
-            <p className="text-fx-700 leading-relaxed">
-              In addition to reading books, I subscribe to a number of different regular newsletters. 
-              Generally speaking, I think following the 24-hour news cycle is a waste of time, but I'll 
-              gladly read any sort of{' '}
-              <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">content</a>{' '}
-              which offers deep analysis or contains new subject matter.
-            </p>
-
-            <p className="text-fx-700 leading-relaxed">
-              I haven't found many forums for sharing the "best ones", so I figured I'd add my own 
-              list here.
-            </p>
-
-            <ul className="space-y-3 mt-6">
-              <li className="flex items-start space-x-3">
-                <span className="text-fx-red text-lg">•</span>
-                <div>
-                  <a href="#" className="text-fx-red hover:text-fx-orange transition-colors font-semibold">
-                    The Tech Report
-                  </a>
-                  <span className="text-fx-black"> — technology trends, startup insights, tech perspective.</span>
-                </div>
-              </li>
-              
-              <li className="flex items-start space-x-3">
-                <span className="text-fx-red text-lg">•</span>
-                <div>
-                  <a href="#" className="text-fx-red hover:text-fx-orange transition-colors font-semibold">
-                    Developer Weekly
-                  </a>
-                  <span className="text-fx-black"> — a wide variety of topics, generally practical, always interesting.</span>
-                </div>
-              </li>
-              
-              <li className="flex items-start space-x-3">
-                <span className="text-fx-red text-lg">•</span>
-                <div>
-                  <a href="#" className="text-fx-red hover:text-fx-orange transition-colors font-semibold">
-                    Innovation Digest
-                  </a>
-                  <span className="text-fx-black"> — startup news with a strategy focus.</span>
-                </div>
-              </li>
-              
-              <li className="flex items-start space-x-3">
-                <span className="text-fx-red text-lg">•</span>
-                <div>
-                  <a href="#" className="text-fx-red hover:text-fx-orange transition-colors font-semibold">
-                    Tech Finance
-                  </a>
-                  <span className="text-fx-black"> — finance insights, laced with technology wit.</span>
-                </div>
-              </li>
-            </ul>
-          </div>
         </section>
 
         {/* Footer - About this site section */}
