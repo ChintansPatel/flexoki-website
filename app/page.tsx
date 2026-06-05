@@ -10,7 +10,6 @@ export default function Home() {
             <a href="/" className="hover:text-fx-orange transition-colors font-semibold">About</a>
             <a href="/writing" className="hover:text-fx-orange transition-colors">Writing</a>
             <a href="/bookshelf" className="hover:text-fx-orange transition-colors">Bookshelf</a>
-            <a href="/projects" className="hover:text-fx-orange transition-colors">Projects</a>
           </nav>
         </header>
 
@@ -98,7 +97,6 @@ export default function Home() {
               <li><a href="/" className="hover:text-fx-orange transition-colors">About</a></li>
               <li><a href="/writing" className="hover:text-fx-orange transition-colors">Writing</a></li>
               <li><a href="/bookshelf" className="hover:text-fx-orange transition-colors">Bookshelf</a></li>
-              <li><a href="/projects" className="hover:text-fx-orange transition-colors">Projects</a></li>
               <li><a href="https://www.linkedin.com/in/chintanpatel42" className="hover:text-fx-orange transition-colors" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
             </ul>
           </div>
