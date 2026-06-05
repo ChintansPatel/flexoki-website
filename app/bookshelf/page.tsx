@@ -58,7 +58,6 @@ export default function Bookshelf() {
               <li><a href="/" className="hover:text-fx-orange transition-colors">About</a></li>
               <li><a href="/writing" className="hover:text-fx-orange transition-colors">Writing</a></li>
               <li><a href="/bookshelf" className="hover:text-fx-orange transition-colors">Bookshelf</a></li>
-              <li><a href="/projects" className="hover:text-fx-orange transition-colors">Projects</a></li>
               <li><a href="https://www.linkedin.com/in/chintanpatel42" className="hover:text-fx-orange transition-colors" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
             </ul>
           </div>
