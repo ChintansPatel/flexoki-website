@@ -11,3 +11,5 @@ I am a lifelong learner, constantly drawing inspiration from the books I read to
 Outside of my professional and academic pursuits, I deeply cherish the time I spend with family and friends. You can also find me on the court as an avid volleyball enthusiast or proudly cheering on the US National Team.
 
 **Contacting Me:** Please get in touch with me on [LinkedIn](https://www.linkedin.com/in/chintanpatel42). I am happy to chat.
+
+[Resume](/resume)
