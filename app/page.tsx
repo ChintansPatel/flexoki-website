@@ -16,7 +16,7 @@ export default function Home() {
         </header>
 
         {/* About Content — edit this in content/about.mdx */}
-        <section className="space-y-6">
+        <section className="space-y-6 text-justify">
           <AboutContent />
         </section>
 
