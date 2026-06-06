@@ -33,19 +33,6 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Navigation Footer */}
-        <nav className="border-t border-fx-200 pt-8">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="text-fx-red text-2xl">🏔️</div>
-            <ul className="flex flex-col items-center space-y-2 text-fx-red">
-              <li><a href="/" className="hover:text-fx-orange transition-colors">About</a></li>
-              <li><a href="/writing" className="hover:text-fx-orange transition-colors">Writing</a></li>
-              <li><a href="/bookshelf" className="hover:text-fx-orange transition-colors">Bookshelf</a></li>
-              <li><a href="https://www.linkedin.com/in/chintanpatel42" className="hover:text-fx-orange transition-colors" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-            </ul>
-          </div>
-        </nav>
-
       </div>
     </main>
   )
