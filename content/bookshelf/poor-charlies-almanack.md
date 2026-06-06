@@ -1,4 +1,4 @@
-[Poor Charlie's Almanack](#) is styled after Ben Franklin's Poor Richard's Almanack, a sort of 'guide to a life well-lived'. In it, Charlie tries to improve upon the things that old Ben left out, which decidedly skew towards investing + decision-making.
+[Poor Charlie's Almanack?](https://en.wikipedia.org/wiki/Poor_Charlie%27s_Almanack)is styled after Ben Franklin's Poor Richard's Almanack, a sort of 'guide to a life well-lived'. In it, Charlie tries to improve upon the things that old Ben left out, which decidedly skew towards investing + decision-making.
 
 After a bunch of friends recommended it, I decided to dive in. Rather than a sequence of aphorisms, the book is a series of 11 talks that discuss investing advice, success in business, and how to think about big ideas. It's one of those books that I think is probably worth revisiting every 5-10 years to ruminate on. At the very least, to enjoy some of Charlie's folksy wit.
 
