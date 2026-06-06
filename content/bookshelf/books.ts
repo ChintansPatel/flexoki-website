@@ -11,14 +11,4 @@ export const books: Book[] = [
     slug: 'poor-charlies-almanack',
     date: 'Jan 2025',
   },
-  {
-    title: 'Who Moved My Cheese',
-    slug: 'who-moved-my-cheese',
-    date: 'Jan 2024',
-  },
-  {
-    title: 'Atomic Habits',
-    slug: 'atomic-habits',
-    date: 'Jan 2023',
-  },
 ]

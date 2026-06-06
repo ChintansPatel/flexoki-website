@@ -27,9 +27,6 @@ export default function Bookshelf() {
             I always love receiving book recommendations. If some book you've encountered has
             recently changed your world, please send it my way.
           </p>
-          <p className="text-fx-black leading-relaxed italic">
-            * = one of my favorite reads
-          </p>
         </section>
 
         {/* Books List — add new books in content/bookshelf/books.ts */}
