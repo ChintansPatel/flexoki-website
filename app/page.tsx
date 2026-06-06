@@ -1,8 +1,10 @@
+import AboutContent from '@/content/about.mdx'
+
 export default function Home() {
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
       <div className="space-y-8">
-        
+
         {/* Header */}
         <header className="text-center">
           <h1 className="text-3xl font-bold mb-4 text-fx-black">Chintan Patel</h1>
@@ -13,67 +15,9 @@ export default function Home() {
           </nav>
         </header>
 
-        {/* About Content */}
+        {/* About Content — edit this in content/about.mdx */}
         <section className="space-y-6">
-          <p className="text-fx-700 leading-relaxed">
-            I'm Chintan.
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            I'm currently based in Chicago.
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            In 2020, I spent time volunteering with{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">local organizations</a>{' '}
-            on{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">community outreach</a>, and then 
-            working at{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">TechCorp</a>{' '}
-            as a{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">
-              software development partner for enterprise solutions
-            </a>
-            .
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            From 2024-2025 I worked at{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">Microsoft</a>{' '}
-            helping to launch{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">Azure AI Services</a>.
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            I'm currently digging into{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">web development</a>, 
-            education, AI, and Tools for Thought.
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            Since 2019, I've started{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">
-              keeping a log of some the books I'm reading
-            </a>
-            .
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            In my free time, I've been{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">
-              exploring various hiking trails
-            </a>{' '}
-            and hacking on{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">
-              a number of different projects
-            </a>
-            . Every so often, I'll mess around to try and make some{' '}
-            <a href="#" className="text-fx-red hover:text-fx-orange transition-colors">code</a>.
-          </p>
-
-          <p className="text-fx-700 leading-relaxed">
-            <strong>Contacting Me:</strong> If you'd like to get in touch, I'm chintan@ this domain.
-          </p>
+          <AboutContent />
         </section>
 
         {/* Footer - About this site section */}
@@ -85,7 +29,7 @@ export default function Home() {
             <a href="https://tailwindcss.com" className="text-fx-red hover:text-fx-orange transition-colors">Tailwind</a>, and{' '}
             <a href="https://mdxjs.com" className="text-fx-red hover:text-fx-orange transition-colors">MDX</a>. Huge thank you to{' '}
             <a href="https://stephango.com" className="text-fx-red hover:text-fx-orange transition-colors">Steph Ango</a> for the{' '}
-            <a href="https://stephango.com/flexoki" className="text-fx-red hover:text-fx-orange transition-colors">Flexoki theme</a> theme.
+            <a href="https://stephango.com/flexoki" className="text-fx-red hover:text-fx-orange transition-colors">Flexoki theme</a>.
           </p>
         </section>
 

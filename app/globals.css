@@ -53,3 +53,55 @@ a {
 nav a {
   font-weight: 500;
 }
+
+/* Dark mode toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--color-fx-100);
+  color: var(--color-fx-700);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-fx-200);
+}
+
+/* Dark mode overrides */
+html.dark body {
+  background-color: var(--color-fx-black);
+  color: var(--color-fx-paper);
+}
+
+html.dark p,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: var(--color-fx-paper);
+}
+
+html.dark .text-fx-black { color: var(--color-fx-paper); }
+html.dark .text-fx-700 { color: var(--color-fx-300); }
+html.dark .text-fx-500 { color: var(--color-fx-500); }
+html.dark .border-fx-200 { border-color: var(--color-fx-800); }
+
+html.dark .theme-toggle {
+  background-color: var(--color-fx-900);
+  color: var(--color-fx-300);
+}
+
+html.dark .theme-toggle:hover {
+  background-color: var(--color-fx-850);
+}

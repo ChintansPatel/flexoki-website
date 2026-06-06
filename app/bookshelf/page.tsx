@@ -1,8 +1,10 @@
+import { books } from '@/content/bookshelf/books'
+
 export default function Bookshelf() {
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
       <div className="space-y-8">
-        
+
         {/* Header */}
         <header className="text-center">
           <h1 className="text-3xl font-bold mb-4 text-fx-black">Chintan Patel</h1>
@@ -16,38 +18,33 @@ export default function Bookshelf() {
         {/* Bookshelf Introduction */}
         <section className="space-y-6">
           <p className="text-fx-black leading-relaxed">
-            Below, you can find my bookshelf. For each book, I've taken a handful of notes to 
-            surface the key themes of the book. They aren't meant to be comprehensive, but 
-            they are useful to jog my own memory when it comes to remembering the major 
+            Below, you can find my bookshelf. For each book, I've taken a handful of notes to
+            surface the key themes of the book. They aren't meant to be comprehensive, but
+            they are useful to jog my own memory when it comes to remembering the major
             takeaways of each.
           </p>
-
           <p className="text-fx-black leading-relaxed">
-            I always love receiving book recommendations. If some book you've encountered has 
+            I always love receiving book recommendations. If some book you've encountered has
             recently changed your world, please send it my way.
           </p>
-
           <p className="text-fx-black leading-relaxed italic">
             * = one of my favorite reads
           </p>
         </section>
 
-        {/* Books List */}
+        {/* Books List — add new books in content/bookshelf/books.ts */}
         <section className="space-y-4">
-          {/* 2025 Books */}
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/poor-charlies-almanack" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Poor Charlie's Almanack
-            </a>
-            <span className="text-fx-500 text-sm">Jan 2025</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <a href="/bookshelf/atomic-habits" className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium">
-              Atomic Habits
-            </a>
-            <span className="text-fx-500 text-sm">2023</span>
-          </div>
+          {books.map((book) => (
+            <div key={book.slug} className="flex justify-between items-center">
+              <a
+                href={`/bookshelf/${book.slug}`}
+                className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium"
+              >
+                {book.title}{book.favorite ? ' *' : ''}
+              </a>
+              <span className="text-fx-500 text-sm">{book.date}</span>
+            </div>
+          ))}
         </section>
 
         {/* Navigation Footer */}
