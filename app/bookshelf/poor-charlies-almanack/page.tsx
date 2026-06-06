@@ -1,4 +1,4 @@
-import BookContent from '@/content/bookshelf/poor-charlies-almanack.mdx'
+import BookContent from '@/content/bookshelf/poor-charlies-almanack.md'
 
 export default function PoorCharliesAlmanack() {
   return (

@@ -1,4 +1,4 @@
-import PostContent from '@/content/writing/you-still-need-to-think.mdx'
+import PostContent from '@/content/writing/you-still-need-to-think.md'
 
 export default function YouStillNeedToThink() {
   return (

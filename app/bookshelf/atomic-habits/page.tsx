@@ -1,4 +1,4 @@
-import BookContent from '@/content/bookshelf/atomic-habits.mdx'
+import BookContent from '@/content/bookshelf/atomic-habits.md'
 
 export default function AtomicHabits() {
   return (
