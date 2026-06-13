@@ -10,7 +10,7 @@ export default function WhyIDecidedToPursueMBAAtUChicagoBooth() {
           <p className="text-fx-500 text-sm uppercase tracking-wide">JUN 13, 2026</p>
         </header>
 
-        <article className="space-y-6">
+        <article className="space-y-6 text-justify">
           <PostContent />
         </article>
 
