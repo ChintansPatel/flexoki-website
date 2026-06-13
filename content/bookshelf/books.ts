@@ -1,14 +1,12 @@
 export interface Book {
   title: string
   slug: string
-  date: string
   favorite?: boolean
 }
 
 export const books: Book[] = [
   {
-    title: "Poor Charlie's Almanack",
-    slug: 'poor-charlies-almanack',
-    date: 'Jan 2025',
+    title: 'The Story of My Experiments with Truth: An Autobiography: Mahatma Gandhi',
+    slug: 'the-story-of-my-experiments-with-truth',
   },
 ]

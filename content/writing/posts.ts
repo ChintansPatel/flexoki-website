@@ -7,10 +7,9 @@ export interface Post {
 
 export const posts: Post[] = [
   {
-    title: 'You Still Need to Think',
-    slug: 'you-still-need-to-think',
-    date: 'SEP 26, 2025',
-    description:
-      "When it comes to coding agents, the product shape fundamentally shifts how you think.",
+    title: 'Why I Decided to Pursue MBA at UChicago Booth',
+    slug: 'why-i-decided-to-pursue-mba-at-uchicago-booth',
+    date: 'JUN 13, 2026',
+    description: 'How hitting a plateau in my tech career led me to pursue an MBA at one of the world\'s top business schools.',
   },
 ]

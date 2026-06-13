@@ -16,30 +16,22 @@ export default function Bookshelf() {
         </header>
 
         {/* Bookshelf Introduction */}
-        <section className="space-y-6">
+        <section>
           <p className="text-fx-black leading-relaxed">
-            Below, you can find my bookshelf. For each book, I've taken a handful of notes to
-            surface the key themes of the book. They aren't meant to be comprehensive, but
-            they are useful to jog my own memory when it comes to remembering the major
-            takeaways of each.
-          </p>
-          <p className="text-fx-black leading-relaxed">
-            I always love receiving book recommendations. If some book you've encountered has
-            recently changed your world, please send it my way.
+            I love reading because it constantly provides me with new thoughts, ideas, and inspiration. I've read quite a few books over the years, but a handful stand out as truly worth mentioning.
           </p>
         </section>
 
         {/* Books List — add new books in content/bookshelf/books.ts */}
         <section className="space-y-4">
           {books.map((book) => (
-            <div key={book.slug} className="flex justify-between items-center">
+            <div key={book.slug}>
               <a
                 href={`/bookshelf/${book.slug}`}
                 className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium"
               >
                 {book.title}{book.favorite ? ' *' : ''}
               </a>
-              <span className="text-fx-500 text-sm">{book.date}</span>
             </div>
           ))}
         </section>
