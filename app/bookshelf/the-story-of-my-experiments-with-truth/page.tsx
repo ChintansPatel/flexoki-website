@@ -10,7 +10,7 @@ export default function TheStoryOfMyExperimentsWithTruth() {
           <h1 className="text-3xl font-bold mb-2 text-fx-red">The Story of My Experiments with Truth: An Autobiography: Mahatma Gandhi</h1>
         </header>
 
-        <article className="space-y-6">
+        <article className="space-y-6 text-justify">
           <BookContent />
         </article>
 
