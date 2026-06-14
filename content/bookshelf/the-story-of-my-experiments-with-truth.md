@@ -1,6 +1,6 @@
 The book provides a profound look into Mahatma Gandhi's life, covering everything from his early childhood and education in England to his transformative years in South Africa.
 
-Several moments and themes from his journey deeply resonated with me:
+Several moments from his journey deeply resonated with me:
 
 His dedication to studying law in England, which required the immense personal sacrifice of leaving his wife, Kasturba, and their infant son behind in India.
 
