@@ -1,0 +1,70 @@
+## Education
+
+**The University of Chicago Booth School of Business**  
+*May 2024 — May 2027*  
+Master of Business Administration (MBA)
+
+**University of Bridgeport**  
+*Aug 2008 — May 2011*  
+Master of Science (MS), Electrical Engineering
+
+**Gujarat University**  
+*Jun 2003 — May 2007*  
+Bachelor of Science (BS), Electronics and Telecommunications
+
+**The Maharaja Sayajirao University of Baroda**  
+*May 1998 — Jun 2001*  
+Diploma of Education, Petroleum Engineering
+
+## Experience
+
+**Vi — Chicago, Illinois, United States** · *Full-time · 9 yrs 2 mos*
+
+- IT Development Manager — *May 2022 – Present · 3 yrs 2 mos*
+- Senior IT Developer — *Feb 2022 – May 2022 · 4 mos*
+- IT Developer — *Apr 2017 – Feb 2022 · 4 yrs 11 mos*
+
+**Gogo — Chicago, Illinois, United States** · *Full-time · 1 yr 11 mos*
+
+- IT Developer — *May 2015 – Mar 2017 · 1 yr 11 mos*
+
+**BTI Solutions — Overland Park, Kansas, United States** · *Full-time · 4 yrs 1 mo*
+
+- Senior Consultant, Samsung Electronics — *Mar 2013 – May 2015 · 2 yrs 3 mos*
+- Consultant, Samsung Electronics — *May 2011 – Mar 2013 · 1 yr 11 mos*
+
+**Avion Systems — Alpharetta, Georgia, United States** · *Full-time · 8 mos*
+
+- Information Technology Internship — *Oct 2010 – May 2011 · 8 mos*
+
+## Certifications
+
+**Microsoft Certified: Fabric Analytics Engineer Associate**  
+*Credential ID: 553234B38CB2E797*
+
+**Microsoft Certified: Azure Solutions Architect Expert**  
+*Certification Number: I028-5406*
+
+**Microsoft Certified: Azure AI Engineer Associate**  
+*Certification Number: I554-9667*
+
+**Microsoft Certified: Azure Data Scientist Associate**  
+*Certification Number: I498-6014*
+
+**Microsoft Certified: Azure Data Engineer Associate**  
+*Certification Number: I417-6814*
+
+**Microsoft Certified: Azure Fundamentals**  
+*Certification Number: H492-5488*
+
+**MCSA: SQL 2016 Business Intelligence Development**  
+*Certification Number: H423-1733*
+
+**MCSA: SQL 2016 Database Development**  
+*Certification Number: H412-7972*
+
+**MCSE: Data Management And Analytics**  
+*Certification Number: H328-9292*
+
+**MCSA: BI Reporting**  
+*Certification Number: H309-8239*
