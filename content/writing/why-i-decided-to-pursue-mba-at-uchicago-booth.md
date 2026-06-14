@@ -2,9 +2,7 @@ In the summer of 2023, my career was firmly rooted in the technology sector. I h
 
 I realized I was no longer growing at the pace I desired, and I kept returning to a simple but powerful belief: an investment in education always pays the best interest.
 
-The true spark came from a burning curiosity to understand how the broader business world actually works. I didn't just want to execute technical tasks; I wanted to understand the overarching strategies driving corporate decisions.
-
-This realization kicked off a daunting search for the right MBA program. The options were overwhelming—*should I do an online MBA? Should I go to a lower-tier university?*
+The true spark came from a burning curiosity to understand how the broader business world actually works. I didn't just want to execute technical tasks. I wanted to understand the overarching strategies driving corporate decisions.
 
 To find clarity, I attended sample classes at both the University of Chicago Booth and the Kellogg School of Management. Both are top-ranked and incredible, making the choice difficult. Ultimately, Booth's uniquely flexible curriculum stood out to me, and I decided to aim high and give it a try.
 
