@@ -1,6 +1,6 @@
 In the summer of 2023, my career was firmly rooted in the technology sector. I had spent years immersed in the tech world, mastering complex systems and nurturing a lifelong love for education. But despite my passion for learning new things, I had hit a plateau.  
 
-I realized I was no longer growing at the pace I desired, and I kept returning to a simple but powerful belief: an investment in education always pays the best interest.  It is absolutely true and I am 100% Positive. 
+I realized I was no longer growing at the pace I desired, and I kept returning to a simple but powerful belief: an investment in education always pays the best interest. 
 
 The true spark came from a burning curiosity to understand how the broader business world actually works. I didn't just want to execute technical tasks. I wanted to understand the overarching strategies driving corporate decisions.
 
