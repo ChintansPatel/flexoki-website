@@ -10,7 +10,7 @@ Making the decision to aim for Booth meant facing some heavy realities. The pres
 
 I had to ask myself hard questions about whether I could survive such a rigorous program while balancing my family, my full-time work, and my other responsibilities. The fear of dropping the ball on my family or failing to manage the intense workload was a very real, heavy weight that made me question if this path was even possible.
 
-Despite the intimidating stakes, the energy from those sample classes and the value of attending a top-tier university gave me the courage I needed. I chose to lean into the challenge. I submitted my application in the February/March 2024 timeframe, hoping just to land an interview. Fortunately, my interview went exceptionally well. A few weeks later, I received my acceptance letter to start the program in the summer of 2024. I stepped into the rigor of the curriculum, and it immediately began reshaping how I think, work, and lead.
+Despite the intimidating stakes, I submitted my application in the February/March 2024 timeframe, hoping just to land an interview. Fortunately, my interview went exceptionally well. A few weeks later, I received my acceptance letter to start the program in the summer of 2024. I stepped into the rigor of the curriculum, and it immediately began reshaping how I think, work, and lead.
 
 Whenever I reflect on whether taking on that immense pressure was worth it, the answer is an undeniable yes. It was the best decision of my life. The experience has completely transformed me as a person, and I have learned an immeasurable amount during my time in the program. I successfully navigated the difficult balancing act, pushed past my boundaries, and achieved exactly the growth I was looking for.
 
