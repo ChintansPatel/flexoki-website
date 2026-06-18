@@ -12,6 +12,4 @@ A pivotal moment was on June 7, 1893, when a 23-year-old Gandhi was forcibly eje
 
 His eventual return to India, where his commitment to non-violent protest planted the seeds for freedom from British rule.
 
-My Takeaway: Reading this reinforced my desire to help others as much as I can. We are at our best when we foster a society that genuinely cares for one another.
-
 Ultimately, Gandhi's story is a masterclass in servant leadership — a principle I intend to continually apply in my own life.
