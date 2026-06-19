@@ -17,13 +17,10 @@ export default function AI() {
         </header>
 
         <section>
-          <div className="flex items-center gap-4 mb-6">
-            <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-fx-500 whitespace-nowrap">AI</h2>
-            <div className="flex-1 h-px bg-fx-200" />
-          </div>
-          {categoryPosts.length > 0 ? (
-            <div className="space-y-8">
-              {categoryPosts.map((post) => (
+          <a href="/writing" className="text-fx-500 hover:text-fx-red transition-colors text-sm">← Writing</a>
+          <div className="mt-6 space-y-8">
+            {categoryPosts.length > 0 ? (
+              categoryPosts.map((post) => (
                 <div key={post.slug}>
                   <div className="flex items-baseline justify-between gap-4">
                     <a
@@ -36,11 +33,11 @@ export default function AI() {
                   </div>
                   <p className="text-fx-700 text-sm leading-relaxed mt-1">{post.description}</p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-fx-500 text-sm italic">Coming soon.</p>
-          )}
+              ))
+            ) : (
+              <p className="text-fx-500 text-sm italic">Coming soon.</p>
+            )}
+          </div>
         </section>
 
       </div>
