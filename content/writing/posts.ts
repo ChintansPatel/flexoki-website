@@ -16,6 +16,10 @@ export const categories: Category[] = [
   { name: 'AI', slug: 'ai' },
 ]
 
+// To add a new article:
+// 1. Create a .md file in content/writing/<category-slug>/<article-slug>.md
+// 2. Create a route at app/writing/<article-slug>/page.tsx
+// 3. Add an entry below with the matching category slug
 export const posts: Post[] = [
   {
     title: 'Why I Decided to Pursue MBA at UChicago Booth',

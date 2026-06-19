@@ -20,7 +20,7 @@ I had to ask myself hard questions about whether I could survive such a rigorous
 
 The fear of dropping the ball on my family or failing to manage the intense workload was a very real, heavy weight that made me question if this path was even possible.
 
-Despite the intimidating stakes, I submitted my application in the February/March 2024 timeframe, hoping just to land an interview. Fortunately, my interview went exceptionally well. 
+I submitted the application with all the necessary details and all went well including the Interview. 
 
 A few weeks later, I received my acceptance letter to start the program in the summer of 2024. I stepped into the rigor of the curriculum, and it immediately began reshaping how I think, work, and lead.
 
@@ -28,4 +28,4 @@ Whenever I reflect on whether taking on that immense pressure was worth it, the 
 
 The experience has completely transformed me as a person, and I have learned an immeasurable amount during my time in the program. I successfully navigated the difficult balancing act, pushed past my boundaries, and achieved exactly the growth I was looking for.
 
-Finally, it all worked out, and I am incredibly proud to say that I am a Boothie.
+Finally, it all worked out, and I am incredibly proud to say that I am a Boothie. I plan to graduate in 2027. 
