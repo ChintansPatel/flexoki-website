@@ -17,8 +17,7 @@ export default function AI() {
         </header>
 
         <section>
-          <a href="/writing" className="text-fx-500 hover:text-fx-red transition-colors text-sm">← Writing</a>
-          <div className="mt-6 space-y-8">
+          <div className="space-y-8">
             {categoryPosts.length > 0 ? (
               categoryPosts.map((post) => (
                 <div key={post.slug}>

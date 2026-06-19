@@ -17,8 +17,7 @@ export default function LifeAndCareer() {
         </header>
 
         <section>
-          <a href="/writing" className="text-fx-500 hover:text-fx-red transition-colors text-sm">← Writing</a>
-          <div className="mt-6 space-y-8">
+          <div className="space-y-8">
             {categoryPosts.map((post) => (
               <div key={post.slug}>
                 <div className="flex items-baseline justify-between gap-4">
