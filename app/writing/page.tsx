@@ -33,15 +33,19 @@ export default function Writing() {
                   <div className="flex-1 h-px bg-fx-200" />
                 </div>
                 {categoryPosts.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-8">
                     {categoryPosts.map((post) => (
                       <div key={post.slug}>
-                        <a
-                          href={`/writing/${post.slug}`}
-                          className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium"
-                        >
-                          {post.title}
-                        </a>
+                        <div className="flex items-baseline justify-between gap-4">
+                          <a
+                            href={`/writing/${post.slug}`}
+                            className="text-fx-red hover:text-fx-orange transition-colors text-2xl font-bold"
+                          >
+                            {post.title}
+                          </a>
+                          <span className="text-fx-500 text-sm shrink-0">{post.date}</span>
+                        </div>
+                        <p className="text-fx-700 text-sm leading-relaxed mt-1">{post.description}</p>
                       </div>
                     ))}
                   </div>
