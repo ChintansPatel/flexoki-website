@@ -39,7 +39,7 @@ export default function Writing() {
                         <div className="flex items-baseline justify-between gap-4">
                           <a
                             href={`/writing/${post.slug}`}
-                            className="text-fx-black hover:text-fx-red transition-colors text-2xl font-bold"
+                            className="text-fx-red hover:text-fx-orange transition-colors text-2xl font-bold"
                           >
                             {post.title}
                           </a>
