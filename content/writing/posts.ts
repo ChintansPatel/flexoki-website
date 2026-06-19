@@ -28,4 +28,11 @@ export const posts: Post[] = [
     description: 'How hitting a plateau in my tech career led me to pursue an MBA at one of the world\'s top business schools.',
     category: 'life-and-career',
   },
+  {
+    title: 'How I Used AI to Build My Personal Website',
+    slug: 'how-i-used-ai-to-build-my-personal-website',
+    date: 'JUN 19, 2026',
+    description: 'How I used Claude, GitHub, Vercel, and Obsidian to build and deploy my personal site without a traditional CMS.',
+    category: 'ai',
+  },
 ]
