@@ -1,4 +1,4 @@
-import { posts, categories } from '@/content/writing/posts'
+import { categories } from '@/content/writing/posts'
 
 export default function Writing() {
   return (
@@ -22,40 +22,19 @@ export default function Writing() {
           </p>
         </section>
 
-        {/* Posts grouped by category — add new posts in content/writing/posts.ts */}
-        <div className="space-y-8">
-          {categories.map((category) => {
-            const categoryPosts = posts.filter((p) => p.category === category)
-            return (
-              <section key={category}>
-                <div className="flex items-center gap-4 mb-4">
-                  <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-fx-500 whitespace-nowrap">{category}</h2>
-                  <div className="flex-1 h-px bg-fx-200" />
-                </div>
-                {categoryPosts.length > 0 ? (
-                  <div className="space-y-8">
-                    {categoryPosts.map((post) => (
-                      <div key={post.slug}>
-                        <div className="flex items-baseline justify-between gap-4">
-                          <a
-                            href={`/writing/${post.slug}`}
-                            className="text-fx-red hover:text-fx-orange transition-colors text-2xl font-bold"
-                          >
-                            {post.title}
-                          </a>
-                          <span className="text-fx-500 text-sm shrink-0">{post.date}</span>
-                        </div>
-                        <p className="text-fx-700 text-sm leading-relaxed mt-1">{post.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-fx-500 text-sm italic">Coming soon.</p>
-                )}
-              </section>
-            )
-          })}
-        </div>
+        {/* Category Links */}
+        <section className="space-y-4">
+          {categories.map((category) => (
+            <div key={category.slug}>
+              <a
+                href={`/writing/${category.slug}`}
+                className="text-fx-red hover:text-fx-orange transition-colors text-2xl font-bold"
+              >
+                {category.name}
+              </a>
+            </div>
+          ))}
+        </section>
 
       </div>
     </main>
