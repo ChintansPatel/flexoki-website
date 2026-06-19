@@ -8,7 +8,7 @@ I'm already comfortable in Visual Studio Code, so I fired that up and installed 
 
 I took screenshots of the different pages from calv.info to map out the layout. Then, using the Claude Code plugin right inside VS Code, I had the AI generate the site's code based on those images. Claude essentially built the website for me.
 
-To manage my content, I use Obsidian on my desktop to write everything in clean Markdown. The best part? If an idea strikes while I'm on the go, I can just open the GitHub mobile app, edit the text right there, and commit the changes on the fly. Once everything is tied together, the repository is updated on GitHub.
+To manage my content, I use Obsidian on my desktop to write everything in clean Markdown. I also draft longer pieces in Google Docs — once I'm happy with the writing, I download it as a Markdown file and update it directly into the website. The best part? If an idea strikes while I'm on the go, I can just open the GitHub mobile app, edit the text right there, and commit the changes on the fly. Once everything is tied together, the repository is updated on GitHub.
 
 ## Deployment
 
