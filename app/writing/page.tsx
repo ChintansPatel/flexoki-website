@@ -1,4 +1,4 @@
-import { posts } from '@/content/writing/posts'
+import { posts, categories } from '@/content/writing/posts'
 
 export default function Writing() {
   return (
@@ -22,19 +22,36 @@ export default function Writing() {
           </p>
         </section>
 
-        {/* Writing Posts List — add new posts in content/writing/posts.ts */}
-        <section className="space-y-4">
-          {posts.map((post) => (
-            <div key={post.slug}>
-              <a
-                href={`/writing/${post.slug}`}
-                className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium"
-              >
-                {post.title}
-              </a>
-            </div>
-          ))}
-        </section>
+        {/* Posts grouped by category — add new posts in content/writing/posts.ts */}
+        <div className="space-y-8">
+          {categories.map((category) => {
+            const categoryPosts = posts.filter((p) => p.category === category)
+            return (
+              <section key={category}>
+                <div className="flex items-center gap-4 mb-4">
+                  <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-fx-500 whitespace-nowrap">{category}</h2>
+                  <div className="flex-1 h-px bg-fx-200" />
+                </div>
+                {categoryPosts.length > 0 ? (
+                  <div className="space-y-3">
+                    {categoryPosts.map((post) => (
+                      <div key={post.slug}>
+                        <a
+                          href={`/writing/${post.slug}`}
+                          className="text-fx-red hover:text-fx-orange transition-colors text-lg font-medium"
+                        >
+                          {post.title}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-fx-500 text-sm italic">Coming soon.</p>
+                )}
+              </section>
+            )
+          })}
+        </div>
 
       </div>
     </main>
