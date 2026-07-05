@@ -12,7 +12,8 @@ export interface Category {
 }
 
 export const categories: Category[] = [
-  { name: 'Life & Career', slug: 'life-and-career' },
+  { name: 'Personal Stories', slug: 'personal-stories' },
+  { name: 'MBA at UChicago Booth', slug: 'mba-at-uchicago-booth' },
   { name: 'AI', slug: 'ai' },
 ]
 
@@ -26,7 +27,7 @@ export const posts: Post[] = [
     slug: 'why-i-decided-to-pursue-mba-at-uchicago-booth',
     date: 'JUN 13, 2026',
     description: 'How hitting a plateau in my tech career led me to pursue an MBA at one of the world\'s top business schools.',
-    category: 'life-and-career',
+    category: 'mba-at-uchicago-booth',
   },
   {
     title: 'How I Used AI to Build My Personal Website',
