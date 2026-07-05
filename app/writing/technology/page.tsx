@@ -1,8 +1,8 @@
 import { posts } from '@/content/writing/posts'
 
-const categoryPosts = posts.filter((p) => p.category === 'ai')
+const categoryPosts = posts.filter((p) => p.category === 'technology')
 
-export default function AI() {
+export default function Technology() {
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
       <div className="space-y-8">

@@ -1,4 +1,4 @@
-import PostContent from '@/content/writing/ai/how-i-used-ai-to-build-my-personal-website.md'
+import PostContent from '@/content/writing/technology/how-i-used-ai-to-build-my-personal-website.md'
 
 export default function HowIUsedAIToBuildMyPersonalWebsite() {
   return (

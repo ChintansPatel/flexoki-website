@@ -14,7 +14,7 @@ export interface Category {
 export const categories: Category[] = [
   { name: 'Personal Stories', slug: 'personal-stories' },
   { name: 'MBA at UChicago Booth', slug: 'mba-at-uchicago-booth' },
-  { name: 'AI', slug: 'ai' },
+  { name: 'Technology', slug: 'technology' },
 ]
 
 // To add a new article:
@@ -34,6 +34,6 @@ export const posts: Post[] = [
     slug: 'how-i-used-ai-to-build-my-personal-website',
     date: 'JUN 19, 2026',
     description: 'How I used Claude, GitHub, Vercel, and Obsidian to build and deploy my personal site without a traditional CMS.',
-    category: 'ai',
+    category: 'technology',
   },
 ]
