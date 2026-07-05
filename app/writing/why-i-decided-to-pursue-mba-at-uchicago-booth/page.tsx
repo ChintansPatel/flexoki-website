@@ -7,7 +7,6 @@ export default function WhyIDecidedToPursueMBAAtUChicagoBooth() {
 
         <header>
           <h1 className="text-3xl font-bold mb-2 text-fx-red">Why I Decided to Pursue MBA at UChicago Booth</h1>
-          <p className="text-fx-500 text-sm uppercase tracking-wide">JUN 13, 2026</p>
         </header>
 
         <article className="space-y-6 text-justify">
