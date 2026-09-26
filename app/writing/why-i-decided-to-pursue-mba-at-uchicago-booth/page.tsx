@@ -1,4 +1,4 @@
-import PostContent from '@/content/writing/mba-at-uchicago-booth/why-i-decided-to-pursue-mba-at-uchicago-booth.md'
+import PostContent from '@/content/writing/personal-stories/why-i-decided-to-pursue-mba-at-uchicago-booth.md'
 
 export default function WhyIDecidedToPursueMBAAtUChicagoBooth() {
   return (
