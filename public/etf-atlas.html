@@ -68,7 +68,7 @@ select{height:42px;font:inherit;font-size:15px;color:var(--ink);background:var(-
 .pbody{padding:18px 20px 22px}
 .desc{margin:0}
 .cnote{margin:8px 0 0;font-size:14px;color:var(--mute)}
-.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5em,1fr));gap:8px;margin:14px 0 0}
 .facts div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
 .facts dt{font-size:12px;color:var(--mute)}
 .facts dd{margin:0;font-weight:700;font-size:14px;line-height:1.25}
@@ -137,6 +137,9 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .flinks a{display:flex;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:700;font-size:14px}
 .flinks a+a{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 @media(max-width:600px){.flinks a{flex:1;justify-content:center}}
+.aum{font-weight:700;color:var(--ink)}
+.sbar{display:block;height:6px;border-radius:3px;background:var(--card);margin-top:4px;overflow:hidden}
+.sbar i{display:block;height:100%;background:var(--c);border-radius:3px}
 .views{grid-column:1/-1;display:inline-flex;justify-self:start;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:6px}
 .views a{display:flex;align-items:center;height:42px;padding:0 18px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;color:var(--mute)}
 .views a.on{background:var(--ink);color:var(--bg)}
@@ -275,7 +278,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
       <div class="seg" id="seg"></div>
       <p class="levnote" id="levnote" hidden>Leveraged and inverse funds reset daily, so over weeks or months they can stray far from the multiple shown. Most charge close to 1% a year.</p>
       <div id="list"></div>
-      <p class="pfoot">Fees are net expense ratios from issuer pages, checked November 2026 (Tokyo funds: JPX trust fee). Cost = growth lost to the fee versus a fee-free fund. Tap a ticker for its quote. Not investment advice.</p>
+      <p class="pfoot">Fees are net expense ratios from issuer pages, checked November 2026 (Tokyo funds: JPX trust fee). Fund sizes (AUM) from StockAnalysis.com, late October to November 2026, US-listed funds only. Cost = growth lost to the fee versus a fee-free fund. Tap a ticker for its quote. Not investment advice.</p>
     </div>
   </aside>
 </div>
@@ -936,6 +939,10 @@ document.addEventListener('click',e=>{
 return {show:render};
 })();
 
+const AUM={'ACWI':32.62,'ACWX':17.50,'AGG':138.51,'CMDY':0.75734,'EEM':29.07,'EFA':76.80,'EMB':12.69,'EMXC':24.94,'EWA':1.25,'EWC':7.41,'EWG':1.55,'EWH':1.22,'EWJ':23.18,'EWQ':0.33803,'EWU':3.80,'EWY':21.94,'EWZ':13.78,'GSG':1.05,'HYG':16.81,'IAGG':12.58,'IAU':62.34,'IAUM':8.08,'IBIT':65.27,'IEF':41.68,'IEFA':189.88,'IEMG':150.82,'IJH':121.26,'IJR':101.82,'INDA':5.87,'INDY':0.51235,'ITOT':95.96,'IVE':49.87,'IVV':880.08,'IVW':76.86,'IWB':48.57,'IWD':83.69,'IWF':124.50,'IWM':74.64,'IWV':20.32,'IXUS':57.57,'LQD':28.82,'MBB':35.27,'MCHI':5.75,'MTUM':18.51,'MUB':51.71,'QUAL':48.44,'SGOV':116.26,'SHY':27.18,'SLV':28.71,'TIP':14.45,'TLT':46.77,'URTH':8.64,'USHY':25.55,'USMV':23.78,'VLUE':9.00,'DVY':23.21,'BND':164.68,'BNDX':84.34,'MGK':34.15,'MGV':13.87,'VAW':2.93,'VBIL':14.14,'VCR':5.81,'VDC':7.94,'VDE':11.51,'VEA':227.71,'VEU':66.89,'VFH':13.13,'VGT':147.01,'VHT':19.65,'VIG':112.99,'VIOO':4.00,'VIS':7.72,'VMBS':15.75,'VNQ':36.83,'VONE':9.06,'VONG':45.80,'VONV':22.53,'VOO':1050,'VOOG':27.45,'VOOV':6.80,'VOX':5.79,'VPU':8.01,'VT':81.91,'VTEB':51.34,'VTHR':4.88,'VTI':691.75,'VTIP':20.92,'VTV':191.63,'VTWO':16.21,'VUG':227.91,'VWO':122.57,'VXUS':161.20,'VYM':81.45,'IVOO':3.77,'SPY':812.12,'SPYM':182.61,'DIA':46.37,'MDY':25.76,'SPMD':18.47,'SPSM':15.85,'SPTM':14.13,'SPYG':54.98,'SPYV':38.79,'SDY':22.18,'XLB':8.05,'XLC':22.98,'XLE':44.51,'XLF':52.42,'XLI':30.55,'XLK':120.32,'XLP':15.64,'XLRE':7.98,'XLU':23.97,'XLV':47.51,'XLY':22.20,'SPGM':1.80,'FEZ':4.09,'GLD':135.54,'GLDM':30.57,'BIL':51.30,'JNK':5.73,'SPAB':10.46,'SPTL':11.66,'SCHA':22.08,'SCHB':44.50,'SCHD':123.77,'SCHE':12.24,'SCHF':67.91,'SCHH':12.29,'SCHM':14.96,'SCHP':17.45,'SCHX':73.69,'SCHZ':10.69,'SMBS':6.39,'SSO':8.74,'UPRO':5.50,'SH':0.94951,'SDS':0.37806,'SPXU':0.41476,'DDM':0.52881,'UDOW':0.90049,'DOG':0.10458,'DXD':0.04476,'SDOW':0.14591,'QLD':14.20,'TQQQ':35.85,'PSQ':0.63543,'QID':0.22747,'SQQQ':1.95,'UWM':0.21096,'RWM':0.1443,'TWM':0.06155,'TBT':0.31029,'NOBL':11.57,'QQQ':481.82,'QQQM':107.32,'RSP':98.41,'SPXL':6.95,'SPXS':0.32151,'TNA':1.28,'TZA':0.23502,'TMF':2.03,'TMV':0.19246,'QQQE':1.44,'XYLD':3.39,'QYLD':8.40,'RYLD':1.29,'DJIA':0.19098,'DAX':0.2118,'GURU':0.05836,'FBTC':14.43,'FHLC':3.75,'FNCL':2.28,'FTEC':21.06,'ONEQ':10.70,'GBTC':10.08,'BTC':5.09,'BITB':3.10,'KMLM':0.5907,'DBMF':5.09,'QAI':0.99607,'SGOL':6.95,'SIVR':3.81,'DJP':1.04,'ARKB':2.64,'ASHR':1.33,'BAR':1.33,'BCI':3.53,'BBJP':19.20};
+const bn=v=>v>=1000?'$'+(v/1000).toFixed(2)+'T':v>=1?'$'+(v>=100?v.toFixed(0):v.toFixed(1))+'B':'$'+Math.round(v*1000)+'M';
+const aumOf=e=>e[6]?null:(AUM[e[0]]??null);
+const idxTot=x=>x.e.reduce((s,e)=>s+(e[4]!=='p'&&aumOf(e)?aumOf(e):0),0);
 const COL={us:'#1d5bff',style:'#0e8c79',sector:'#e07400',global:'#0b86b8',world:'#d9303a',bond:'#3f46c9',alt:'#8b3cf0',real:'#a87508'};
 const byId=Object.fromEntries(I.map(x=>[x.id,x]));
 const catName=Object.fromEntries(CATS.map(c=>[c[0],c[1]]));
@@ -981,7 +988,7 @@ function renderHead(){
   $('panel').style.setProperty('--c',COL[x.c]);
   $('phead').innerHTML='<div class="prow"><span>'+esc(catName[x.c])+' · '+esc(x.p)+'</span><button class="close" id="close" aria-label="Close">×</button></div><h2>'+esc(x.n)+'</h2>';
   $('pinfo').innerHTML='<p class="desc">'+esc(x.d)+'</p>'+(note?'<p class="cnote">'+esc(note)+'</p>':'')+
-   '<dl class="facts"><div><dt>Holdings</dt><dd>'+esc(x.k[0])+'</dd></div><div><dt>Weighting</dt><dd>'+esc(x.k[1])+'</dd></div><div><dt>Coverage</dt><dd>'+esc(x.k[2])+'</dd></div></dl>';
+   '<dl class="facts"><div><dt>Holdings</dt><dd>'+esc(x.k[0])+'</dd></div><div><dt>Weighting</dt><dd>'+esc(x.k[1])+'</dd></div><div><dt>Coverage</dt><dd>'+esc(x.k[2])+'</dd></div>'+(idxTot(x)?'<div><dt>Money in its ETFs</dt><dd>'+bn(idxTot(x))+'</dd></div>':'')+'</dl>';
   const lv=x.e.filter(e=>isLev(e[4])).length,cn=x.e.length-lv;
   if(!lv)st.mode='core';
   $('seg').className='seg'+(lv?'':' one');
@@ -1008,8 +1015,8 @@ function renderCalc(){
     const tag=lev?'<span class="tag l">'+LEV[e[4]]+'</span>':best?'<span class="tag b">Lowest fee</span>':e[4]!=='t'?'<span class="tag">'+REL[e[4]]+'</span>':'';
     const url='https://finance.yahoo.com/quote/'+encodeURIComponent(sym);
     const open=st.fund===e[0],relx=lev?'Aims for '+LEV[e[4]].replace(' daily','')+' the index\'s daily return':{t:'Holds the index as published',v:'Tracks a close variant of this index',p:'Tracks a different index for the same market',c:'Holds the index and sells call options on it'}[e[4]];
-    const det=open?'<div class="fdet"><dl><div><dt>Index</dt><dd>'+esc(x.n)+'</dd></div><div><dt>Relationship</dt><dd>'+esc(relx)+'</dd></div><div><dt>Expense ratio</dt><dd>'+(e[3]!=null?pct(e[3]):'See issuer')+'</dd></div>'+(e[3]!=null?'<div><dt>Fee per year on '+usd(P)+'</dt><dd>'+usd(P*e[3]/100)+'</dd></div><div><dt>Fee cost over '+n+' years</dt><dd>'+usd(cost(e[3]))+'</dd></div>'+(p.length>1&&!best&&!lev?'<div><dt>Extra vs '+esc(p[0][0])+'</dt><dd>'+usd(cost(e[3])-cost(p[0][3]))+'</dd></div>':''):'')+'<div><dt>Issuer</dt><dd>'+esc(e[2])+'</dd></div><div><dt>Listed</dt><dd>'+esc(e[7]||'US (NYSE / Nasdaq / Cboe)')+'</dd></div></dl><div class="flinks"><a href="'+url+'" target="_blank" rel="noopener">Price &amp; chart on Yahoo Finance ↗</a>'+(e[7]?'':'<a href="https://www.etf.com/'+encodeURIComponent(e[0])+'" target="_blank" rel="noopener">Fund profile on etf.com ↗</a>')+'</div></div>':'';
-    return '<div class="fund'+(best?' isbest':'')+(open?' open':'')+'" role="button" tabindex="0" aria-expanded="'+open+'" data-fund="'+esc(e[0])+'"><span class="ftick">'+esc(e[0])+'</span><div><span class="fname">'+esc(e[1])+'</span><div class="fmeta"><span>'+esc(e[2])+'</span><span>'+esc(e[7]||'US-listed')+'</span>'+tag+'</div></div><div class="ffee"><b>'+(e[3]!=null?pct(e[3]):'—')+'</b><small>'+(e[3]!=null?usd(cost(e[3]))+' / '+n+' yrs':'see issuer')+'</small></div>'+(e[5]?'<div class="fnote">'+esc(e[5])+'</div>':'')+(e[3]!=null?'<div class="fbar"><i style="width:'+Math.max(e[3]/mx*100,2).toFixed(1)+'%"></i></div>':'')+'<span class="chev" aria-hidden="true">'+(open?'Hide details ▴':'Details ▾')+'</span>'+det+'</div>'}).join('');
+    const det=open?'<div class="fdet"><dl><div><dt>Index</dt><dd>'+esc(x.n)+'</dd></div><div><dt>Relationship</dt><dd>'+esc(relx)+'</dd></div><div><dt>Expense ratio</dt><dd>'+(e[3]!=null?pct(e[3]):'See issuer')+'</dd></div>'+(aumOf(e)?'<div><dt>Fund size (AUM)</dt><dd>'+bn(aumOf(e))+'</dd></div>'+(e[4]!=='p'&&idxTot(x)?'<div><dt>Share of money tracking this index</dt><dd>'+(aumOf(e)/idxTot(x)*100).toFixed(1)+'%<span class="sbar"><i style="width:'+(aumOf(e)/idxTot(x)*100).toFixed(1)+'%"></i></span></dd></div>':'<div><dt>Money note</dt><dd>Proxy: tracks a different index, so not counted in this index\'s total</dd></div>'):'<div><dt>Fund size (AUM)</dt><dd>Not available for this local listing</dd></div>')+(e[3]!=null?'<div><dt>Fee per year on '+usd(P)+'</dt><dd>'+usd(P*e[3]/100)+'</dd></div><div><dt>Fee cost over '+n+' years</dt><dd>'+usd(cost(e[3]))+'</dd></div>'+(p.length>1&&!best&&!lev?'<div><dt>Extra vs '+esc(p[0][0])+'</dt><dd>'+usd(cost(e[3])-cost(p[0][3]))+'</dd></div>':''):'')+'<div><dt>Issuer</dt><dd>'+esc(e[2])+'</dd></div><div><dt>Listed</dt><dd>'+esc(e[7]||'US (NYSE / Nasdaq / Cboe)')+'</dd></div></dl><div class="flinks"><a href="'+url+'" target="_blank" rel="noopener">Price &amp; chart on Yahoo Finance ↗</a>'+(e[7]?'':'<a href="https://www.etf.com/'+encodeURIComponent(e[0])+'" target="_blank" rel="noopener">Fund profile on etf.com ↗</a>')+'</div></div>':'';
+    return '<div class="fund'+(best?' isbest':'')+(open?' open':'')+'" role="button" tabindex="0" aria-expanded="'+open+'" data-fund="'+esc(e[0])+'"><span class="ftick">'+esc(e[0])+'</span><div><span class="fname">'+esc(e[1])+'</span><div class="fmeta"><span>'+esc(e[2])+'</span><span>'+esc(e[7]||'US-listed')+'</span>'+(aumOf(e)?'<span class="aum">AUM '+bn(aumOf(e))+'</span>':'')+tag+'</div></div><div class="ffee"><b>'+(e[3]!=null?pct(e[3]):'—')+'</b><small>'+(e[3]!=null?usd(cost(e[3]))+' / '+n+' yrs':'see issuer')+'</small></div>'+(e[5]?'<div class="fnote">'+esc(e[5])+'</div>':'')+(e[3]!=null?'<div class="fbar"><i style="width:'+Math.max(e[3]/mx*100,2).toFixed(1)+'%"></i></div>':'')+'<span class="chev" aria-hidden="true">'+(open?'Hide details ▴':'Details ▾')+'</span>'+det+'</div>'}).join('');
 }
 function setOpen(o){st.open=o&&mq.matches;$('panel').classList.toggle('open',st.open);$('scrim').classList.toggle('open',st.open);document.body.classList.toggle('lock',st.open)}
 function renderAll(){renderTabs();renderGrid();renderHead();renderCalc()}
