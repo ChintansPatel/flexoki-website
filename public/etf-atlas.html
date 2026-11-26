@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETF Index Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE work, a polished money app
+   IDEA a market map: every index a coloured tile, open one to see the funds that copy it
+   PICTURE the tile wall by asset class, and a detail panel of fund cards with fee bars and dollar cost
+   COLOUR white ground, ink black, one strong colour per asset class
+   TYPE Figtree 800 display + Figtree text
+   LAYOUT laptop: tiles left, sticky detail panel right; phone: tiles, detail as a bottom sheet */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1115);--card:light-dark(#f4f5f7,#181b21);--card2:light-dark(#ffffff,#1f232b);--ink:light-dark(#0d1117,#e9ebef);--mute:light-dark(#5a6170,#9ba2ae);--line:light-dark(#e2e5ea,#2a2f38);--hot:#ff4f00}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:clip}
+body.lock{overflow:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(16px,3vw,env(safe-area-inset-left,0px));padding-right:max(16px,3vw,env(safe-area-inset-right,0px))}
+.top{padding-top:clamp(20px,3vw,36px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:14px 32px;align-items:end}
+h1{font-size:clamp(32px,4.4vw,52px);line-height:1.02;letter-spacing:-.03em;margin:0;font-weight:800}
+.sub{margin:8px 0 0;color:var(--mute);font-size:17px}
+.search{position:relative}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#q{width:100%;height:50px;font:inherit;font-size:16px;padding:0 16px 0 44px;border:1px solid var(--line);border-radius:25px;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23888' stroke-width='2'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='m13 13 4 4'/%3E%3C/svg%3E") no-repeat 16px 50%;color:var(--ink)}
+.results{position:absolute;z-index:30;top:56px;left:0;right:0;background:var(--card2);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgb(0 0 0/.18);max-height:60vh;overflow:auto;padding:6px}
+.results button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:none;border-radius:10px;cursor:pointer;min-height:44px}
+.results button:hover,.results button.on{background:var(--card)}
+.results small{display:block;color:var(--mute);font-size:13px}
+.results .none{margin:0;padding:12px;color:var(--mute)}
+.bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-top:20px}
+.barin{display:flex;gap:12px;align-items:center;padding-top:10px;padding-bottom:10px}
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex:1}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:21px;border:1px solid var(--line);background:var(--card2);cursor:pointer;font-size:15px;font-weight:600;white-space:nowrap}
+.tab i{width:10px;height:10px;border-radius:50%;background:var(--c,var(--ink))}
+.tab small{color:var(--mute);font-weight:500}
+.tab.on{background:var(--c,var(--ink));border-color:var(--c,var(--ink));color:#fff}
+.tab.on i{background:#fff}
+.tab.on small{color:rgb(255 255 255/.8)}
+select{height:42px;font:inherit;font-size:15px;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:21px;padding:0 12px;max-width:44vw}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:28px;align-items:start;padding-top:22px;padding-bottom:40px}
+.gsec{margin-bottom:26px}
+.gsec h2{display:flex;align-items:center;gap:10px;font-size:20px;letter-spacing:-.01em;margin:0 0 12px;font-weight:800}
+.gsec h2 i{width:12px;height:12px;border-radius:4px;background:var(--c)}
+.gsec h2 small{font-size:14px;color:var(--mute);font-weight:500}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tile{position:relative;display:flex;flex-direction:column;gap:4px;text-align:left;padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--card);cursor:pointer;min-height:132px;transition:transform .15s,box-shadow .15s,border-color .15s}
+.tile:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgb(0 0 0/.08);border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.tile.on{background:color-mix(in srgb,var(--c) 10%,var(--card2));border:2px solid var(--c);padding:15px}
+.tprov{font-size:13px;color:var(--mute);font-weight:500}
+.tname{font-size:18px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
+.tstats{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:13px;font-weight:600;padding:2px 9px;border-radius:10px;background:var(--card2);border:1px solid var(--line);white-space:nowrap}
+.pill.c{background:color-mix(in srgb,var(--c) 14%,transparent);border-color:transparent;color:color-mix(in srgb,var(--c) 70%,var(--ink))}
+.panel{position:sticky;top:76px;max-height:calc(100svh - 92px);overflow:auto;border-radius:20px;background:var(--card);border:1px solid var(--line);overscroll-behavior:contain}
+.phead{position:sticky;top:0;z-index:2;background:var(--c);color:#fff;padding:18px 20px 20px}
+.prow{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:14px;font-weight:600;opacity:.92}
+.close{display:none;width:40px;height:40px;border-radius:20px;border:0;background:rgb(255 255 255/.2);color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.phead h2{font-size:clamp(26px,3vw,34px);line-height:1.05;letter-spacing:-.025em;margin:6px 0 0;font-weight:800;text-wrap:balance}
+.pbody{padding:18px 20px 22px}
+.desc{margin:0}
+.cnote{margin:8px 0 0;font-size:14px;color:var(--mute)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0}
+.facts div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.facts dt{font-size:12px;color:var(--mute)}
+.facts dd{margin:0;font-weight:700;font-size:14px;line-height:1.25}
+.best{margin-top:16px;border-radius:16px;padding:16px 18px;background:var(--ink);color:var(--bg)}
+.bk{font-size:13px;font-weight:600;opacity:.75}
+.brow{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:2px}
+.btick{font-size:clamp(34px,5vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.bfee{font-size:24px;font-weight:800;color:var(--hot);white-space:nowrap}
+.best p{margin:8px 0 0;font-size:15px;opacity:.9}
+.best p b{color:var(--hot)}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,.9fr);gap:10px;margin-top:14px}
+.ctl{display:flex;flex-direction:column;font-size:12px;color:var(--mute);font-weight:600;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+.ctl input[type=number]{border:0;background:none;color:var(--ink);font:inherit;font-size:17px;font-weight:700;height:30px;padding:0;width:100%}
+.ctl output{color:var(--ink)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-8px;border-radius:50%;background:var(--c);border:3px solid var(--card2);box-shadow:0 0 0 1px var(--c)}
+input[type=range]::-moz-range-track{height:4px;background:var(--line);border-radius:2px}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--c);border:3px solid var(--card2)}
+.seg{display:flex;gap:4px;margin:18px 0 10px;padding:4px;background:var(--card2);border:1px solid var(--line);border-radius:14px}
+.seg button{flex:1;height:40px;border:0;border-radius:10px;background:none;cursor:pointer;font-weight:600;font-size:14px}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg.one{display:block;background:none;border:0;padding:0}
+.seg.one h3{margin:0;font-size:17px;font-weight:800}
+.levnote{font-size:13px;color:var(--mute);margin:0 0 10px}
+.fund{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px;border-radius:14px;background:var(--card2);border:1px solid var(--line);margin-bottom:8px}
+.fund.isbest{border:2px solid var(--hot);padding:11px}
+.ftick{display:flex;align-items:center;justify-content:center;height:48px;border-radius:10px;font-weight:800;font-size:15px;letter-spacing:-.01em;background:color-mix(in srgb,var(--c) 13%,transparent);color:color-mix(in srgb,var(--c) 72%,var(--ink));text-decoration:none;overflow:hidden}
+.fname{font-weight:700;font-size:15px;line-height:1.25;display:block}
+.fmeta{font-size:13px;color:var(--mute);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.tag{font-size:12px;font-weight:700;padding:1px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+.tag.l{border-color:var(--hot);color:var(--hot)}
+.tag.b{background:var(--hot);border-color:var(--hot);color:#fff}
+.fnote{grid-column:2/-1;font-size:13px;color:var(--mute)}
+.ffee{text-align:right;white-space:nowrap}
+.ffee b{display:block;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.ffee small{display:block;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.fbar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--card);margin-top:6px;overflow:hidden}
+.fbar i{display:block;height:100%;border-radius:3px;background:var(--c);transform-origin:left;animation:grow .5s ease-out both}
+.isbest .fbar i{background:var(--hot)}
+@keyframes grow{from{transform:scaleX(0)}}
+.pfoot{font-size:12px;color:var(--mute);margin:14px 0 0}
+.meta{color:var(--mute);font-size:13px;padding-bottom:28px}
+.scrim{display:none}
+@media(prefers-reduced-motion:reduce){.fbar i{animation:none}.tile,.panel{transition:none}}
+@media(max-width:1020px){
+.layout{grid-template-columns:minmax(0,1fr)}
+.panel{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:90svh;height:90svh;border-radius:22px 22px 0 0;z-index:40;transform:translateY(105%);transition:transform .3s ease;border-bottom:0}
+.panel.open{transform:none}
+.close{display:block}
+.scrim{display:block;position:fixed;inset:0;background:rgb(0 0 0/.45);z-index:35;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.open{opacity:1;pointer-events:auto}
+}
+@media(max-width:760px){.top{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{min-height:120px;padding:12px}.tile.on{padding:11px}.tname{font-size:16px}.calc{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.calc .yrs{grid-column:1/-1;order:3}.fund{grid-template-columns:62px minmax(0,1fr) auto}.ftick{font-size:13px}.facts dd{font-size:13px}}
+.fund{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.fund:hover{border-color:color-mix(in srgb,var(--c) 50%,var(--line));box-shadow:0 4px 14px rgb(0 0 0/.06)}
+.fund.open{border:2px solid var(--c);padding:11px}
+.fund.isbest.open{border-color:var(--hot)}
+.chev{grid-column:1/-1;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--c) 70%,var(--ink));margin-top:6px}
+.fdet{grid-column:1/-1;margin-top:8px;padding-top:12px;border-top:1px solid var(--line);cursor:auto}
+.fdet dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:0}
+.fdet dt{font-size:12px;color:var(--mute);font-weight:600}
+.fdet dd{margin:0;font-weight:700;font-size:14px}
+.flinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.flinks a{display:flex;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:700;font-size:14px}
+.flinks a+a{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+@media(max-width:600px){.flinks a{flex:1;justify-content:center}}
+.views{grid-column:1/-1;display:inline-flex;justify-self:start;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:6px}
+.views a{display:flex;align-items:center;height:42px;padding:0 18px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;color:var(--mute)}
+.views a.on{background:var(--ink);color:var(--bg)}
+#rview{--s1:light-dark(#257de0,#338ced);--s2:light-dark(#f47230,#e76624);--s3:light-dark(#00b894,#00a888);--s4:light-dark(#f2a600,#d28e05);--s5:light-dark(#ee7fac,#e24d8b);--s6:light-dark(#008a17,#0aac23);--pos:light-dark(#257de0,#338ced);--neg:light-dark(#ec4647,#eb6263);padding-top:20px;padding-bottom:36px}
+.rbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.achips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.achips::-webkit-scrollbar{display:none}
+.achip{flex:none;display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:21px;border:1px solid var(--line);background:var(--card2);cursor:pointer;font-weight:600;font-size:15px;white-space:nowrap}
+.achip i{width:10px;height:10px;border-radius:50%;background:var(--sc)}
+.achip.on{border:2px solid var(--sc);background:color-mix(in srgb,var(--sc) 12%,var(--card2));padding:0 13px}
+.period{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pre{height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);cursor:pointer;font-weight:600;font-size:14px}
+.pre.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.period select{height:38px;border-radius:10px;font-size:15px;padding:0 8px}
+.period label{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.rhead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 20px;align-items:end;margin:22px 0 14px}
+.rhead h2{font-size:clamp(26px,3.2vw,38px);line-height:1.08;letter-spacing:-.025em;margin:0;font-weight:800;text-wrap:balance}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5em,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat span{display:block;font-size:13px;color:var(--mute);font-weight:600}
+.stat b{display:block;font-size:clamp(22px,2.6vw,28px);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat small{display:block;font-size:12px;color:var(--mute)}
+.stat.key{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stat.key span,.stat.key small{color:inherit;opacity:.75}
+.charts{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+.cbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 10px}
+.cbox h3{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.cbox .csub{margin:2px 0 8px;font-size:13px;color:var(--mute)}
+.fig{position:relative;height:340px}
+.fig svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fig text{font:12px Figtree,system-ui,sans-serif;fill:var(--mute)}
+.fig .lbl{font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:4px}
+.tip{position:absolute;pointer-events:none;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;box-shadow:0 8px 20px rgb(0 0 0/.15);white-space:nowrap;z-index:3}
+.tip b{font-size:14px}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.tip div{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;margin-top:6px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;border-radius:2px;background:var(--sc)}
+.cmp{margin-top:16px}
+.cmp table{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
+.cmp th{text-align:right;font-size:13px;font-weight:600;color:var(--mute);padding:8px 10px;border-bottom:1px solid var(--ink)}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cmp td:first-child{font-weight:700}
+.cmp td:first-child i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--sc);margin-right:8px}
+.cmp tr.on td{background:color-mix(in srgb,var(--sc) 10%,transparent)}
+.cmp tr.prem td{color:var(--mute)}
+.cmp tr.prem td:first-child{font-weight:600}
+.scrollx{overflow-x:auto}
+.src{font-size:13px;color:var(--mute);margin:14px 0 0}
+@media(max-width:1020px){.charts{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.fig{height:280px}.rhead{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.views{display:flex;justify-self:stretch}.views a{flex:1;justify-content:center;padding:0 8px}}
+#wview{--wpos:light-dark(#257de0,#338ced);--wneg:light-dark(#ec4647,#eb6263);padding-top:20px;padding-bottom:36px}
+.qwrap{overflow-x:auto;margin:0 -4px;padding:0 4px 6px}
+.qt{display:grid;gap:3px;min-width:max-content}
+.qh{position:sticky;top:0;height:34px;border:0;background:var(--card);font-weight:800;font-size:13px;cursor:pointer;border-radius:8px}
+.qh.on{background:var(--ink);color:var(--bg)}
+.qs{position:sticky;left:0;z-index:1;background:var(--card)}
+.qr{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--mute)}
+.ql{justify-content:flex-start;padding:0 8px;border:0;border-radius:8px;cursor:pointer;color:var(--ink);font-size:13px;text-align:left}
+.ql.on{background:var(--ink);color:var(--bg)}
+.qc{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:46px;padding:3px 4px;border:0;border-radius:8px;cursor:pointer;font-variant-numeric:tabular-nums;line-height:1.15;transition:opacity .15s}
+.qc b{font-size:12px;font-weight:700;white-space:nowrap}
+.qc span{font-size:12px;font-weight:600}
+.qc small{font-size:10px;opacity:.8}
+.qc.dim{opacity:.22}
+.qc.hi{outline:3px solid var(--ink);outline-offset:-1px}
+.whint{color:var(--mute);font-size:14px;margin:0 0 12px}
+.wprof{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:14px}
+.wprof b{display:block;font-size:18px;font-weight:800}
+.wprof small,.wk{display:block;font-size:12px;color:var(--mute);font-weight:600}
+.wprof .pre{margin-left:auto}
+.wtwo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;margin-top:16px;align-items:start}
+.ychips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 12px}
+.ychips::-webkit-scrollbar{display:none}
+.ychips .pre{flex:none;height:34px}
+.srow{display:grid;grid-template-columns:9.5em minmax(0,1fr) 4.4em;gap:10px;align-items:center;padding:5px 4px;border-radius:8px;cursor:pointer}
+.srow:hover,.srow.hi{background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.sn{font-size:14px;font-weight:600;white-space:nowrap}
+.sn em{font-style:normal;font-size:11px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px}
+.sn em.up{background:color-mix(in srgb,var(--wpos) 16%,transparent);color:color-mix(in srgb,var(--wpos) 70%,var(--ink))}
+.sn em.dn{background:color-mix(in srgb,var(--wneg) 16%,transparent);color:color-mix(in srgb,var(--wneg) 70%,var(--ink))}
+.strack{position:relative;height:14px;border-left:0}
+.strack::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--mute)}
+.strack i{position:absolute;top:2px;bottom:2px;border-radius:3px}
+.sv{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.wt{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.wt th{text-align:right;padding:0;border-bottom:1px solid var(--ink)}
+.wt th:first-child{text-align:left;font-size:13px;color:var(--mute);font-weight:600;padding:8px}
+.wt th button{border:0;background:none;cursor:pointer;font-size:13px;color:var(--mute);font-weight:600;padding:8px;min-height:40px;white-space:nowrap}
+.wt td{padding:8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wt td:first-child{text-align:left}
+.wt td small{display:block;font-size:11px;color:var(--mute)}
+.wt tr{cursor:pointer}
+.wt tr.on td{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+@media(max-width:1020px){.wtwo{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.srow{grid-template-columns:8.2em minmax(0,1fr) 4em;gap:6px}.sn{font-size:13px}.views a{padding:0 6px;font-size:14px}}
+.qh.ytd{outline:2px dashed var(--mute);outline-offset:-2px}
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <div>
+    <h1>ETF Index Atlas</h1>
+    <p class="sub"><a href="/" style="color:var(--mute);font-size:14px;text-decoration:none">← chintanpatel.me</a></p>
+    <p class="sub" id="subline">Tap an index to see every ETF that tracks it, ranked by cost.</p>
+  </div>
+  <div class="search">
+    <label class="sr" for="q">Search indices, tickers or providers</label>
+    <input id="q" type="search" autocomplete="off" placeholder="Search MSCI, SCHD, Nikkei, gold…">
+    <div id="results" class="results" hidden></div>
+  </div>
+  <nav class="views" aria-label="Views"><a href="#sp500" id="v-etf" class="on">ETF finder</a><a href="#returns" id="v-ret">Historical returns</a><a href="#winners" id="v-win">Winners &amp; losers</a></nav>
+</header>
+<div id="etfview">
+
+<div class="bar"><div class="wrap barin">
+  <div class="tabs" id="tabs" role="tablist" aria-label="Asset classes"></div>
+  <label class="sr" for="prov">Index provider</label>
+  <select id="prov"></select>
+</div></div>
+
+<div class="wrap layout">
+  <main id="grid"></main>
+  <aside class="panel" id="panel" aria-label="Index details">
+    <div class="phead" id="phead"></div>
+    <div class="pbody">
+      <div id="pinfo"></div>
+      <div class="best" id="best"></div>
+      <div class="calc">
+        <label class="ctl" for="amt">Invested ($)<input id="amt" type="number" min="100" step="1000" inputmode="decimal"></label>
+        <label class="ctl yrs" for="yrs">Years: <output id="yrsv"></output><input id="yrs" type="range" min="1" max="40" step="1"></label>
+        <label class="ctl" for="ret">Return %<input id="ret" type="number" min="0" max="20" step="0.5" inputmode="decimal"></label>
+      </div>
+      <div class="seg" id="seg"></div>
+      <p class="levnote" id="levnote" hidden>Leveraged and inverse funds reset daily, so over weeks or months they can stray far from the multiple shown. Most charge close to 1% a year.</p>
+      <div id="list"></div>
+      <p class="pfoot">Fees are net expense ratios from issuer pages, checked November 2026 (Tokyo funds: JPX trust fee). Cost = growth lost to the fee versus a fee-free fund. Tap a ticker for its quote. Not investment advice.</p>
+    </div>
+  </aside>
+</div>
+<div class="scrim" id="scrim"></div>
+</div>
+<section id="rview" class="wrap" hidden>
+  <div class="rbar">
+    <div class="achips" id="achips" aria-label="Asset"></div>
+    <div class="period" id="period">
+      <button class="pre" data-pre="all">All years</button>
+      <button class="pre" data-pre="50">50 yrs</button>
+      <button class="pre" data-pre="25">25 yrs</button>
+      <button class="pre" data-pre="10">10 yrs</button>
+      <label for="ry0">From <select id="ry0"></select></label>
+      <label for="ry1">to <select id="ry1"></select></label>
+    </div>
+  </div>
+  <div class="rhead"><h2 id="rtitle"></h2></div>
+  <div class="stats" id="rstats"></div>
+  <div class="charts">
+    <div class="cbox"><h3 id="bt">Yearly returns</h3><p class="csub">Each bar is one calendar year. Dashed line: geometric average; dotted: arithmetic.</p><div class="fig" id="fbar"><svg id="sbar" role="img" aria-label="Yearly returns bar chart"></svg><div class="tip" id="tbar" hidden></div></div></div>
+    <div class="cbox"><h3>Growth of $100</h3><p class="csub">All six assets over the same years, log scale.</p><div class="fig" id="fgr"><svg id="sgr" role="img" aria-label="Growth of 100 dollars, log scale"></svg><div class="tip" id="tgr" hidden></div></div><div class="legend" id="leg"></div></div>
+  </div>
+  <div class="cbox cmp"><h3>All assets, same period</h3><p class="csub">Risk premium rows subtract the safe asset's average from the S&amp;P 500's.</p><div class="scrollx"><table id="rtbl"></table></div></div>
+  <p class="src">Data: Aswath Damodaran, <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html" target="_blank" rel="noopener">Historical Returns on Stocks, Bonds, Bills and Real Estate</a>, NYU Stern, updated January 5, 2026. Nominal annual total returns, 1928–2025.</p>
+</section>
+<section id="wview" class="wrap" hidden>
+  <div class="rbar">
+    <div class="period" id="wgroups"></div>
+    <div class="period" id="wviews"></div>
+  </div>
+  <div class="rhead"><h2>Which equity indices won and lost each year, 2006–2026</h2></div>
+  <div id="wsel"></div>
+  <div class="cbox"><h3>Annual return quilt</h3><p class="csub">Blue is a gain, red a loss; deeper colour means a bigger move. Tap a year to see its ranking below. 2026 is year to date through Oct 30, 2026.</p><div class="qwrap" id="quilt"></div></div>
+  <div class="wtwo">
+    <div class="cbox"><h3 id="wyt"></h3><div class="ychips" id="wyc"></div><div id="spot"></div></div>
+    <div class="cbox"><h3>20-year scorecard</h3><p class="csub">Full years 2006–2025; 2026 YTD shown separately. Ranks are within the group shown. Tap a column to sort.</p><div class="scrollx"><table class="wt" id="wtbl"></table></div></div>
+  </div>
+  <p class="src">Calendar-year returns in US dollars. S&amp;P 500, Russell 2000, MSCI EAFE, MSCI EM and MSCI country indices: total return with dividends reinvested (<a href="https://novelinvestor.com/historical-returns/" target="_blank" rel="noopener">Novel Investor</a>, MSCI data; MSCI China and India 2012–2025 from MSCI factsheets). MSCI ACWI and World: net total return (<a href="https://www.msci.com/documents/10199/255599/msci-acwi-net.pdf" target="_blank" rel="noopener">MSCI factsheets</a>). Dow and Nasdaq-100: price return only, so they understate total return by about 2 and 1 points a year (<a href="https://www.slickcharts.com/dowjones/returns" target="_blank" rel="noopener">SlickCharts</a>). 2026 YTD runs through October 30, 2026: MSCI indices from MSCI factsheets (net USD; China gross); Dow, Nasdaq-100 and S&amp;P 500 from FRED closing prices (price only, so the S&amp;P 500 figure leaves out about a point of dividends); Russell 2000 total return from FTSE Russell. Country returns include currency moves. Past results do not predict future ones; not investment advice.</p>
+</section>
+
+<p class="wrap meta" id="meta"></p>
+
+<script>
+{
+const CATS=[
+['us','US equity',''],
+['style','Style, factor & dividend',''],
+['sector','Sectors',''],
+['global','Global & international',''],
+['world','World markets','Local funds trade in their home currency and market hours. US-listed proxies give the same country through a different index, usually MSCI.'],
+['bond','Fixed income',''],
+['alt','Hedge fund & alternatives','No ETF tracks the HFRI or HFRX hedge fund indices directly. These funds copy hedge-fund returns with liquid futures and ETFs.'],
+['real','Commodities, crypto & real estate','']];
+
+// [ticker, name, issuer, expense ratio %, relationship, note, quote symbol, listing]
+const I=[
+{id:'sp500',n:'S&P 500',c:'us',p:'S&P DJI',d:'About 500 leading US large caps chosen by committee, covering roughly 80% of US market value.',k:['~500','Float-adjusted cap','US large cap'],e:[
+['SPY','SPDR S&P 500 ETF Trust','State Street',0.0945,'t','The first US ETF (1993) and the deepest options market'],
+['IVV','iShares Core S&P 500 ETF','iShares',0.03,'t',''],
+['VOO','Vanguard S&P 500 ETF','Vanguard',0.03,'t','Passed SPY in assets in 2025'],
+['SPYM','SPDR Portfolio S&P 500 ETF','State Street',0.02,'t','Ticker was SPLG until Oct 31, 2025'],
+['XYLD','Global X S&P 500 Covered Call ETF','Global X',0.60,'c','Tracks the Cboe S&P 500 BuyWrite'],
+['SSO','ProShares Ultra S&P500','ProShares',null,'2x',''],
+['UPRO','ProShares UltraPro S&P500','ProShares',null,'3x',''],
+['SPXL','Direxion Daily S&P 500 Bull 3X','Direxion',null,'3x',''],
+['SH','ProShares Short S&P500','ProShares',null,'-1x',''],
+['SDS','ProShares UltraShort S&P500','ProShares',null,'-2x',''],
+['SPXU','ProShares UltraPro Short S&P500','ProShares',null,'-3x',''],
+['SPXS','Direxion Daily S&P 500 Bear 3X','Direxion',null,'-3x','']]},
+{id:'dow',n:'Dow Jones Industrial Average',c:'us',p:'S&P DJI',d:'30 blue chips, price-weighted: a stock\'s share price, not the company\'s size, sets its weight.',k:['30','Price-weighted','US large cap'],e:[
+['DIA','SPDR Dow Jones Industrial Average ETF Trust','State Street',0.16,'t','Pays dividends monthly'],
+['DJIA','Global X Dow 30 Covered Call ETF','Global X',0.60,'c','Sells calls on the Dow'],
+['DDM','ProShares Ultra Dow30','ProShares',null,'2x',''],
+['UDOW','ProShares UltraPro Dow30','ProShares',null,'3x',''],
+['DOG','ProShares Short Dow30','ProShares',null,'-1x',''],
+['DXD','ProShares UltraShort Dow30','ProShares',null,'-2x',''],
+['SDOW','ProShares UltraPro Short Dow30','ProShares',null,'-3x','']]},
+{id:'nasdaq-100',n:'Nasdaq-100',c:'us',p:'Nasdaq',d:'The 100 largest non-financial companies listed on Nasdaq, heavy in technology.',k:['~100','Modified cap','US large cap'],e:[
+['QQQ','Invesco QQQ','Invesco',0.18,'t','Became an open-end fund Dec 2025; fee cut from 0.20%'],
+['QQQM','Invesco Nasdaq 100 ETF','Invesco',0.15,'t','Cheaper share class for buy-and-hold'],
+['QQQE','Direxion NASDAQ-100 Equal Weighted Index Shares','Direxion',0.35,'v','Equal-weighted version'],
+['QYLD','Global X Nasdaq 100 Covered Call ETF','Global X',0.60,'c','Tracks the Cboe Nasdaq-100 BuyWrite V2'],
+['QLD','ProShares Ultra QQQ','ProShares',null,'2x',''],
+['TQQQ','ProShares UltraPro QQQ','ProShares',null,'3x',''],
+['PSQ','ProShares Short QQQ','ProShares',null,'-1x',''],
+['QID','ProShares UltraShort QQQ','ProShares',null,'-2x',''],
+['SQQQ','ProShares UltraPro Short QQQ','ProShares',null,'-3x','']]},
+{id:'nasdaq-composite',n:'Nasdaq Composite',c:'us',p:'Nasdaq',d:'Nearly every stock listed on the Nasdaq exchange, from mega caps to micro caps.',k:['3,000+','Market cap','US all cap'],e:[
+['ONEQ','Fidelity Nasdaq Composite Index ETF','Fidelity',0.21,'t','']]},
+{id:'russell-1000',n:'Russell 1000',c:'us',p:'FTSE Russell',d:'The largest ~1,000 US companies, about 93% of the US market.',k:['~1,000','Float-adjusted cap','US large & mid cap'],e:[
+['IWB','iShares Russell 1000 ETF','iShares',0.15,'t',''],
+['VONE','Vanguard Russell 1000 ETF','Vanguard',0.06,'t','Fee cut Feb 2026']]},
+{id:'russell-2000',n:'Russell 2000',c:'us',p:'FTSE Russell',d:'The small-cap benchmark: US companies ranked 1,001 to 3,000 by size.',k:['~2,000','Float-adjusted cap','US small cap'],e:[
+['IWM','iShares Russell 2000 ETF','iShares',0.19,'t','Heavily traded, with deep options'],
+['VTWO','Vanguard Russell 2000 ETF','Vanguard',0.06,'t','Fee cut Feb 2026'],
+['RYLD','Global X Russell 2000 Covered Call ETF','Global X',0.60,'c','Tracks the Cboe Russell 2000 BuyWrite'],
+['UWM','ProShares Ultra Russell2000','ProShares',null,'2x',''],
+['TNA','Direxion Daily Small Cap Bull 3X','Direxion',null,'3x',''],
+['RWM','ProShares Short Russell2000','ProShares',null,'-1x',''],
+['TWM','ProShares UltraShort Russell2000','ProShares',null,'-2x',''],
+['TZA','Direxion Daily Small Cap Bear 3X','Direxion',null,'-3x','']]},
+{id:'russell-3000',n:'Russell 3000',c:'us',p:'FTSE Russell',d:'The 3,000 largest US stocks, about 97% of investable US equity.',k:['~3,000','Float-adjusted cap','US total market'],e:[
+['IWV','iShares Russell 3000 ETF','iShares',0.20,'t',''],
+['VTHR','Vanguard Russell 3000 ETF','Vanguard',0.06,'t','']]},
+{id:'crsp-total',n:'CRSP US Total Market',c:'us',p:'CRSP',d:'Close to 100% of the investable US market, micro caps included.',k:['~3,500','Float-adjusted cap','US total market'],e:[
+['VTI','Vanguard Total Stock Market ETF','Vanguard',0.03,'t','One of the largest ETFs in the world']]},
+{id:'sp-total',n:'S&P Total Market',c:'us',p:'S&P DJI',d:'Every eligible US common stock, from large to micro cap.',k:['All eligible','Float-adjusted cap','US total market'],e:[
+['ITOT','iShares Core S&P Total U.S. Stock Market ETF','iShares',0.03,'t',''],
+['SPTM','SPDR Portfolio S&P 1500 Composite Stock Market ETF','State Street',0.03,'v','S&P Composite 1500 (the 500, 400 and 600 combined)']]},
+{id:'dj-broad',n:'Dow Jones U.S. Broad Stock Market',c:'us',p:'S&P DJI',d:'The largest 2,500 US stocks. Schwab\'s core US equity ETFs are slices of the same family.',k:['2,500','Float-adjusted cap','US total market'],e:[
+['SCHB','Schwab U.S. Broad Market ETF','Schwab',0.03,'t',''],
+['SCHX','Schwab U.S. Large-Cap ETF','Schwab',0.03,'v','Large-cap slice'],
+['SCHM','Schwab U.S. Mid-Cap ETF','Schwab',0.03,'v','Mid-cap slice; fee cut June 2026'],
+['SCHA','Schwab U.S. Small-Cap ETF','Schwab',0.03,'v','Small-cap slice; fee cut June 2026']]},
+{id:'sp-400',n:'S&P MidCap 400',c:'us',p:'S&P DJI',d:'400 US mid caps, screened for profitability and liquidity.',k:['400','Float-adjusted cap','US mid cap'],e:[
+['IJH','iShares Core S&P Mid-Cap ETF','iShares',0.05,'t',''],
+['MDY','SPDR S&P MidCap 400 ETF Trust','State Street',0.23,'t','The first mid-cap ETF (1995)'],
+['SPMD','SPDR Portfolio S&P 400 Mid Cap ETF','State Street',0.03,'t',''],
+['IVOO','Vanguard S&P Mid-Cap 400 ETF','Vanguard',0.07,'t','']]},
+{id:'sp-600',n:'S&P SmallCap 600',c:'us',p:'S&P DJI',d:'600 US small caps with a profitability screen, which keeps out many of the money-losers found in the Russell 2000.',k:['600','Float-adjusted cap','US small cap'],e:[
+['IJR','iShares Core S&P Small-Cap ETF','iShares',0.06,'t',''],
+['SPSM','SPDR Portfolio S&P 600 Small Cap ETF','State Street',0.03,'t',''],
+['VIOO','Vanguard S&P Small-Cap 600 ETF','Vanguard',0.07,'t','']]},
+{id:'sp-500-equal',n:'S&P 500 Equal Weight',c:'us',p:'S&P DJI',d:'The same S&P 500 companies, each held at about 0.2% and rebalanced quarterly.',k:['~500','Equal-weighted','US large cap'],e:[
+['RSP','Invesco S&P 500 Equal Weight ETF','Invesco',0.20,'t','']]},
+
+{id:'russell-1000-growth',n:'Russell 1000 Growth',c:'style',p:'FTSE Russell',d:'Russell 1000 stocks with the stronger growth profile: higher price-to-book and forecast growth.',k:['~390','Float-adjusted cap','US large growth'],e:[
+['IWF','iShares Russell 1000 Growth ETF','iShares',0.18,'t',''],
+['VONG','Vanguard Russell 1000 Growth ETF','Vanguard',0.06,'t','Fee cut Feb 2026']]},
+{id:'russell-1000-value',n:'Russell 1000 Value',c:'style',p:'FTSE Russell',d:'Russell 1000 stocks with the stronger value profile: lower price-to-book and slower forecast growth.',k:['~870','Float-adjusted cap','US large value'],e:[
+['IWD','iShares Russell 1000 Value ETF','iShares',0.18,'t',''],
+['VONV','Vanguard Russell 1000 Value ETF','Vanguard',0.06,'t','Fee cut Feb 2026']]},
+{id:'sp-500-growth',n:'S&P 500 Growth',c:'style',p:'S&P DJI',d:'The growth side of the S&P 500, scored on sales growth, earnings change and momentum.',k:['~150','Float-adjusted cap','US large growth'],e:[
+['SPYG','SPDR Portfolio S&P 500 Growth ETF','State Street',0.04,'t',''],
+['IVW','iShares S&P 500 Growth ETF','iShares',0.18,'t',''],
+['VOOG','Vanguard S&P 500 Growth ETF','Vanguard',0.07,'t','']]},
+{id:'sp-500-value',n:'S&P 500 Value',c:'style',p:'S&P DJI',d:'The value side of the S&P 500, scored on book-to-price, earnings-to-price and sales-to-price.',k:['~400','Float-adjusted cap','US large value'],e:[
+['SPYV','SPDR Portfolio S&P 500 Value ETF','State Street',0.04,'t',''],
+['IVE','iShares S&P 500 Value ETF','iShares',0.18,'t',''],
+['VOOV','Vanguard S&P 500 Value ETF','Vanguard',0.07,'t','']]},
+{id:'crsp-growth',n:'CRSP US Large Cap Growth',c:'style',p:'CRSP',d:'The growth side of CRSP\'s large caps, sorted on six growth factors.',k:['~160','Float-adjusted cap','US large growth'],e:[
+['VUG','Vanguard Growth ETF','Vanguard',0.03,'t','Fee cut Feb 2026'],
+['MGK','Vanguard Mega Cap Growth ETF','Vanguard',0.05,'v','CRSP US Mega Cap Growth: the biggest names only']]},
+{id:'crsp-value',n:'CRSP US Large Cap Value',c:'style',p:'CRSP',d:'The value side of CRSP\'s large caps, sorted on five value factors.',k:['~330','Float-adjusted cap','US large value'],e:[
+['VTV','Vanguard Value ETF','Vanguard',0.03,'t','Fee cut Feb 2026'],
+['MGV','Vanguard Mega Cap Value ETF','Vanguard',0.05,'v','CRSP US Mega Cap Value']]},
+{id:'msci-min-vol',n:'MSCI USA Minimum Volatility',c:'style',p:'MSCI',d:'US stocks combined to give the lowest expected volatility, within sector and stock limits.',k:['~170','Optimized','US large & mid cap'],e:[
+['USMV','iShares MSCI USA Min Vol Factor ETF','iShares',0.15,'t','']]},
+{id:'msci-momentum',n:'MSCI USA Momentum',c:'style',p:'MSCI',d:'US stocks with the strongest risk-adjusted 6- and 12-month price momentum.',k:['~125','Momentum-scaled cap','US large & mid cap'],e:[
+['MTUM','iShares MSCI USA Momentum Factor ETF','iShares',0.15,'t','']]},
+{id:'msci-quality',n:'MSCI USA Sector Neutral Quality',c:'style',p:'MSCI',d:'US stocks with high return on equity, steady earnings and low debt, with sector weights held to the parent index.',k:['~125','Quality-scaled cap','US large & mid cap'],e:[
+['QUAL','iShares MSCI USA Quality Factor ETF','iShares',0.15,'t','']]},
+{id:'msci-value',n:'MSCI USA Enhanced Value',c:'style',p:'MSCI',d:'US stocks that look cheap on forward earnings, book value and enterprise value to cash flow.',k:['~150','Value-scaled cap','US large & mid cap'],e:[
+['VLUE','iShares MSCI USA Value Factor ETF','iShares',0.15,'t','']]},
+{id:'dj-dividend-100',n:'Dow Jones U.S. Dividend 100',c:'style',p:'S&P DJI',d:'100 high-yielders with at least 10 years of dividends, screened for cash flow, return on equity and dividend growth.',k:['100','Modified cap','US dividend'],e:[
+['SCHD','Schwab U.S. Dividend Equity ETF','Schwab',0.06,'t','']]},
+{id:'sp-dividend-growers',n:'S&P U.S. Dividend Growers',c:'style',p:'S&P DJI',d:'Companies with at least 10 straight years of dividend growth; the highest-yielding 25% are left out.',k:['~340','Float-adjusted cap','US dividend growth'],e:[
+['VIG','Vanguard Dividend Appreciation ETF','Vanguard',0.04,'t','Fee cut Feb 2026']]},
+{id:'dividend-aristocrats',n:'S&P 500 Dividend Aristocrats',c:'style',p:'S&P DJI',d:'S&P 500 members that have raised their dividend for 25+ years in a row, held in equal weights.',k:['~70','Equal-weighted','US dividend growth'],e:[
+['NOBL','ProShares S&P 500 Dividend Aristocrats ETF','ProShares',0.35,'t','']]},
+{id:'ftse-high-dividend',n:'FTSE High Dividend Yield',c:'style',p:'FTSE Russell',d:'US stocks with above-average forecast dividend yields; REITs are excluded.',k:['~580','Float-adjusted cap','US high dividend'],e:[
+['VYM','Vanguard High Dividend Yield ETF','Vanguard',0.04,'t','Fee cut Feb 2026']]},
+{id:'dj-select-dividend',n:'Dow Jones U.S. Select Dividend',c:'style',p:'S&P DJI',d:'100 of the highest-yielding US stocks with a steady payment record, weighted by dividend paid.',k:['100','Dividend-weighted','US high dividend'],e:[
+['DVY','iShares Select Dividend ETF','iShares',0.38,'t','']]},
+{id:'sp-hy-aristocrats',n:'S&P High Yield Dividend Aristocrats',c:'style',p:'S&P DJI',d:'S&P Composite 1500 stocks with 20+ years of dividend increases, weighted by yield.',k:['~150','Yield-weighted','US dividend'],e:[
+['SDY','SPDR S&P Dividend ETF','State Street',0.35,'t','']]},
+
+{id:'select-sectors',n:'S&P Select Sector indices',c:'sector',p:'S&P DJI',d:'The S&P 500 cut into its 11 GICS sectors, with caps so no single stock dominates a sector.',k:['11 indices','Capped cap','US large cap'],e:[
+['XLK','Technology Select Sector SPDR Fund','State Street',0.08,'t','Technology'],
+['XLF','Financial Select Sector SPDR Fund','State Street',0.08,'t','Financials'],
+['XLV','Health Care Select Sector SPDR Fund','State Street',0.08,'t','Health care'],
+['XLY','Consumer Discretionary Select Sector SPDR Fund','State Street',0.08,'t','Consumer discretionary'],
+['XLC','Communication Services Select Sector SPDR Fund','State Street',0.08,'t','Communication services'],
+['XLI','Industrial Select Sector SPDR Fund','State Street',0.08,'t','Industrials'],
+['XLP','Consumer Staples Select Sector SPDR Fund','State Street',0.08,'t','Consumer staples'],
+['XLE','Energy Select Sector SPDR Fund','State Street',0.08,'t','Energy'],
+['XLU','Utilities Select Sector SPDR Fund','State Street',0.08,'t','Utilities'],
+['XLB','Materials Select Sector SPDR Fund','State Street',0.08,'t','Materials'],
+['XLRE','Real Estate Select Sector SPDR Fund','State Street',0.08,'t','Real estate']]},
+{id:'msci-sectors',n:'MSCI US IMI sector 25/50 indices',c:'sector',p:'MSCI',d:'Large, mid and small caps in each sector, with 25/50 limits on the biggest weights.',k:['10 sectors','Capped cap','US all cap'],e:[
+['FTEC','Fidelity MSCI Information Technology Index ETF','Fidelity',0.084,'t','Information technology'],
+['FHLC','Fidelity MSCI Health Care Index ETF','Fidelity',0.084,'t','Health care'],
+['FNCL','Fidelity MSCI Financials Index ETF','Fidelity',0.084,'t','Financials'],
+['VGT','Vanguard Information Technology ETF','Vanguard',0.09,'t','Information technology'],
+['VHT','Vanguard Health Care ETF','Vanguard',0.09,'t','Health care'],
+['VFH','Vanguard Financials ETF','Vanguard',0.09,'t','Financials'],
+['VCR','Vanguard Consumer Discretionary ETF','Vanguard',0.09,'t','Consumer discretionary'],
+['VOX','Vanguard Communication Services ETF','Vanguard',0.09,'t','Communication services'],
+['VIS','Vanguard Industrials ETF','Vanguard',0.09,'t','Industrials'],
+['VDC','Vanguard Consumer Staples ETF','Vanguard',0.09,'t','Consumer staples'],
+['VDE','Vanguard Energy ETF','Vanguard',0.09,'t','Energy'],
+['VPU','Vanguard Utilities ETF','Vanguard',0.09,'t','Utilities'],
+['VAW','Vanguard Materials ETF','Vanguard',0.09,'t','Materials']]},
+
+{id:'msci-acwi',n:'MSCI ACWI',c:'global',p:'MSCI',d:'Large and mid caps across 23 developed and 24 emerging markets, about 85% of world equity.',k:['~2,500','Float-adjusted cap','Global'],e:[
+['ACWI','iShares MSCI ACWI ETF','iShares',0.32,'t',''],
+['SPGM','SPDR Portfolio MSCI Global Stock Market ETF','State Street',0.09,'v','MSCI ACWI IMI: adds small caps']]},
+{id:'ftse-global-all-cap',n:'FTSE Global All Cap',c:'global',p:'FTSE Russell',d:'Large, mid and small caps worldwide: the broadest single-fund way to own global stocks.',k:['~10,000','Float-adjusted cap','Global'],e:[
+['VT','Vanguard Total World Stock ETF','Vanguard',0.06,'t','']]},
+{id:'msci-world',n:'MSCI World',c:'global',p:'MSCI',d:'Large and mid caps in 23 developed markets. Emerging markets are not included.',k:['~1,350','Float-adjusted cap','Developed'],e:[
+['URTH','iShares MSCI World ETF','iShares',0.24,'t',''],
+['SWDA','iShares Core MSCI World UCITS ETF','iShares',0.20,'t','UCITS fund for non-US investors; also trades as IWDA in Amsterdam','SWDA.L','London']]},
+{id:'msci-eafe',n:'MSCI EAFE',c:'global',p:'MSCI',d:'Developed markets in Europe, Australasia and the Far East. The US and Canada are left out.',k:['~700','Float-adjusted cap','Developed ex-North America'],e:[
+['EFA','iShares MSCI EAFE ETF','iShares',0.32,'t','Heavily traded, with options'],
+['IEFA','iShares Core MSCI EAFE ETF','iShares',0.07,'v','MSCI EAFE IMI: adds small caps']]},
+{id:'msci-em',n:'MSCI Emerging Markets',c:'global',p:'MSCI',d:'Large and mid caps across 24 emerging markets; Taiwan, China, India and Korea carry most of the weight.',k:['~1,200','Float-adjusted cap','Emerging'],e:[
+['EEM','iShares MSCI Emerging Markets ETF','iShares',0.72,'t','Costly, but the most traded emerging-markets ETF'],
+['IEMG','iShares Core MSCI Emerging Markets ETF','iShares',0.09,'v','MSCI EM IMI: adds small caps'],
+['EMXC','iShares MSCI Emerging Markets ex China ETF','iShares',0.25,'v','Same index without China']]},
+{id:'msci-acwi-ex-us',n:'MSCI ACWI ex USA',c:'global',p:'MSCI',d:'Developed and emerging markets outside the US, large and mid caps.',k:['~2,000','Float-adjusted cap','Global ex-US'],e:[
+['ACWX','iShares MSCI ACWI ex U.S. ETF','iShares',0.32,'t',''],
+['IXUS','iShares Core MSCI Total International Stock ETF','iShares',0.07,'v','MSCI ACWI ex USA IMI: adds small caps']]},
+{id:'ftse-developed',n:'FTSE Developed All Cap ex US',c:'global',p:'FTSE Russell',d:'Developed markets outside the US across all sizes, including Canada and South Korea.',k:['~4,000','Float-adjusted cap','Developed ex-US'],e:[
+['VEA','Vanguard FTSE Developed Markets ETF','Vanguard',0.03,'t',''],
+['SCHF','Schwab International Equity ETF','Schwab',0.03,'v','FTSE Developed ex US: large and mid caps only']]},
+{id:'ftse-emerging',n:'FTSE Emerging Markets All Cap China A Inclusion',c:'global',p:'FTSE Russell',d:'Emerging markets across all sizes, including mainland China A-shares. FTSE counts South Korea as developed.',k:['~6,000','Float-adjusted cap','Emerging'],e:[
+['VWO','Vanguard FTSE Emerging Markets ETF','Vanguard',0.06,'t','Fee cut Feb 2026'],
+['SCHE','Schwab Emerging Markets Equity ETF','Schwab',0.06,'v','FTSE Emerging: large and mid caps; fee cut June 2026']]},
+{id:'ftse-ex-us',n:'FTSE Global All Cap ex US',c:'global',p:'FTSE Russell',d:'Every market except the US, developed and emerging, large to small.',k:['~8,600','Float-adjusted cap','Global ex-US'],e:[
+['VXUS','Vanguard Total International Stock ETF','Vanguard',0.05,'t',''],
+['VEU','Vanguard FTSE All-World ex-US ETF','Vanguard',0.04,'v','FTSE All-World ex US: large and mid caps only']]},
+
+{id:'nikkei-225',n:'Nikkei 225',c:'world',p:'Nikkei',d:'225 stocks from the Tokyo Prime Market, price-weighted like the Dow.',k:['225','Price-weighted','Japan'],e:[
+['1329','iShares Core Nikkei 225 ETF','iShares',0.045,'t','Trust fee per JPX','1329.T','Tokyo'],
+['1321','NEXT FUNDS Nikkei 225 ETF','Nomura',0.0817,'t','Trust fee per JPX; tiered by fund size','1321.T','Tokyo'],
+['BBJP','JPMorgan BetaBuilders Japan ETF','J.P. Morgan',0.19,'p','Morningstar Japan index'],
+['EWJ','iShares MSCI Japan ETF','iShares',0.50,'p','MSCI Japan']]},
+{id:'topix',n:'TOPIX',c:'world',p:'JPX',d:'The broad, cap-weighted measure of the Tokyo market.',k:['~1,700','Float-adjusted cap','Japan'],e:[
+['1306','NEXT FUNDS TOPIX ETF','Nomura',null,'t','','1306.T','Tokyo'],
+['BBJP','JPMorgan BetaBuilders Japan ETF','J.P. Morgan',0.19,'p','Morningstar Japan index'],
+['EWJ','iShares MSCI Japan ETF','iShares',0.50,'p','MSCI Japan']]},
+{id:'ftse-100',n:'FTSE 100',c:'world',p:'FTSE Russell',d:'The 100 largest London-listed companies; most of their sales are earned outside the UK.',k:['100','Float-adjusted cap','UK'],e:[
+['ISF','iShares Core FTSE 100 UCITS ETF','iShares',0.07,'t','','ISF.L','London'],
+['VUKE','Vanguard FTSE 100 UCITS ETF','Vanguard',0.09,'t','','VUKE.L','London'],
+['EWU','iShares MSCI United Kingdom ETF','iShares',0.50,'p','MSCI United Kingdom']]},
+{id:'dax',n:'DAX',c:'world',p:'STOXX (Deutsche Börse)',d:'The 40 largest Frankfurt-listed companies. It is a total-return index, so dividends are reinvested.',k:['40','Float-adjusted cap','Germany'],e:[
+['EXS1','iShares Core DAX UCITS ETF (DE)','iShares',0.16,'t','','EXS1.DE','Xetra'],
+['DAX','Global X DAX Germany ETF','Global X',0.20,'t','US-listed'],
+['EWG','iShares MSCI Germany ETF','iShares',0.50,'p','MSCI Germany']]},
+{id:'cac-40',n:'CAC 40',c:'world',p:'Euronext',d:'40 of the largest Paris-listed companies; luxury, energy and industrials weigh heavily.',k:['40','Float-adjusted cap','France'],e:[
+['C40','Amundi CAC 40 UCITS ETF','Amundi',null,'t','','C40.PA','Paris'],
+['EWQ','iShares MSCI France ETF','iShares',0.50,'p','MSCI France']]},
+{id:'euro-stoxx-50',n:'EURO STOXX 50',c:'world',p:'STOXX',d:'50 blue-chip companies from eurozone countries.',k:['50','Float-adjusted cap','Eurozone'],e:[
+['FEZ','SPDR EURO STOXX 50 ETF','State Street',0.29,'t','US-listed'],
+['EXW1','iShares Core EURO STOXX 50 UCITS ETF (DE)','iShares',null,'t','','EXW1.DE','Xetra']]},
+{id:'hang-seng',n:'Hang Seng Index',c:'world',p:'Hang Seng Indexes',d:'The largest Hong Kong-listed companies, mainland giants included; no single stock may pass 8%.',k:['~85','Capped float cap','Hong Kong'],e:[
+['2800','Tracker Fund of Hong Kong','Hang Seng Investment',0.06,'t','Ongoing charges per 2026 key facts','2800.HK','Hong Kong'],
+['EWH','iShares MSCI Hong Kong ETF','iShares',0.50,'p','MSCI Hong Kong leaves out most mainland firms']]},
+{id:'csi-300',n:'CSI 300',c:'world',p:'China Securities Index',d:'The 300 largest A-shares traded in Shanghai and Shenzhen.',k:['300','Float-adjusted cap','China A-shares'],e:[
+['ASHR','Xtrackers Harvest CSI 300 China A-Shares ETF','Xtrackers',0.65,'t','US-listed'],
+['510300','Huatai-PineBridge CSI 300 ETF','Huatai-PineBridge',null,'t','','510300.SS','Shanghai'],
+['MCHI','iShares MSCI China ETF','iShares',0.59,'p','MSCI China: mostly Hong Kong and US listings']]},
+{id:'nifty-50',n:'Nifty 50',c:'world',p:'NSE Indices',d:'The 50 largest, most liquid companies on India\'s National Stock Exchange.',k:['50','Float-adjusted cap','India'],e:[
+['NIFTYBEES','Nippon India ETF Nifty 50 BeES','Nippon India',0.04,'t','India\'s first ETF (2001)','NIFTYBEES.NS','NSE'],
+['INDY','iShares India 50 ETF','iShares',0.65,'t','US-listed'],
+['INDA','iShares MSCI India ETF','iShares',0.61,'p','MSCI India']]},
+{id:'kospi-200',n:'KOSPI 200',c:'world',p:'Korea Exchange',d:'200 large Korean companies; Samsung Electronics and SK Hynix dominate.',k:['200','Float-adjusted cap','South Korea'],e:[
+['069500','Samsung KODEX 200 ETF','Samsung Asset Mgmt',null,'t','','069500.KS','Korea Exchange'],
+['EWY','iShares MSCI South Korea ETF','iShares',0.59,'p','MSCI Korea 25/50']]},
+{id:'sp-tsx-60',n:'S&P/TSX 60',c:'world',p:'S&P DJI',d:'60 Canadian blue chips; banks and energy lead.',k:['60','Float-adjusted cap','Canada'],e:[
+['XIU','iShares S&P/TSX 60 Index ETF','iShares',0.18,'t','','XIU.TO','Toronto'],
+['XIC','iShares Core S&P/TSX Capped Composite Index ETF','iShares',0.06,'v','The broader Composite (~220 stocks)','XIC.TO','Toronto'],
+['EWC','iShares MSCI Canada ETF','iShares',0.50,'p','MSCI Canada']]},
+{id:'sp-asx-200',n:'S&P/ASX 200',c:'world',p:'S&P DJI',d:'The 200 largest ASX stocks; banks and miners make up much of it.',k:['200','Float-adjusted cap','Australia'],e:[
+['STW','SPDR S&P/ASX 200 ETF','State Street',0.05,'t','Australia\'s first ETF (2001)','STW.AX','ASX'],
+['IOZ','iShares Core S&P/ASX 200 ETF','iShares',0.05,'t','','IOZ.AX','ASX'],
+['EWA','iShares MSCI Australia ETF','iShares',0.50,'p','MSCI Australia']]},
+{id:'ibovespa',n:'Ibovespa',c:'world',p:'B3',d:'The most traded stocks on Brazil\'s B3 exchange; Petrobras, Vale and the big banks lead.',k:['~85','Free-float cap','Brazil'],e:[
+['BOVA11','iShares Ibovespa Fundo de Índice','iShares',null,'t','','BOVA11.SA','B3 São Paulo'],
+['EWZ','iShares MSCI Brazil ETF','iShares',0.59,'p','MSCI Brazil 25/50']]},
+
+{id:'us-aggregate',n:'Bloomberg US Aggregate',c:'bond',p:'Bloomberg',d:'Investment-grade US bonds: Treasuries, agency mortgages and corporates. The core bond benchmark.',k:['~13,000','Market value','US investment grade'],e:[
+['AGG','iShares Core U.S. Aggregate Bond ETF','iShares',0.03,'t',''],
+['SCHZ','Schwab U.S. Aggregate Bond ETF','Schwab',0.03,'t',''],
+['SPAB','SPDR Portfolio Aggregate Bond ETF','State Street',0.03,'t',''],
+['BND','Vanguard Total Bond Market ETF','Vanguard',0.03,'v','Float-adjusted version of the Agg']]},
+{id:'treasury-20',n:'ICE US Treasury 20+ Year',c:'bond',p:'ICE',d:'Treasury bonds with more than 20 years to maturity: the long end of the curve, very sensitive to rates.',k:['~40','Market value','US long Treasuries'],e:[
+['TLT','iShares 20+ Year Treasury Bond ETF','iShares',0.15,'t',''],
+['SPTL','SPDR Portfolio Long Term Treasury ETF','State Street',0.03,'v','Bloomberg Long US Treasury (10+ years)'],
+['TMF','Direxion Daily 20+ Year Treasury Bull 3X','Direxion',null,'3x',''],
+['TBT','ProShares UltraShort 20+ Year Treasury','ProShares',null,'-2x',''],
+['TMV','Direxion Daily 20+ Year Treasury Bear 3X','Direxion',null,'-3x','']]},
+{id:'treasury-7-10',n:'ICE US Treasury 7-10 Year',c:'bond',p:'ICE',d:'Treasuries maturing in 7 to 10 years: the belly of the curve.',k:['~15','Market value','US Treasuries'],e:[
+['IEF','iShares 7-10 Year Treasury Bond ETF','iShares',0.15,'t','']]},
+{id:'treasury-1-3',n:'ICE US Treasury 1-3 Year',c:'bond',p:'ICE',d:'Short-dated Treasuries maturing in 1 to 3 years, with low rate risk.',k:['~90','Market value','US Treasuries'],e:[
+['SHY','iShares 1-3 Year Treasury Bond ETF','iShares',0.15,'t','']]},
+{id:'t-bills',n:'ICE 0-3 Month US Treasury Securities',c:'bond',p:'ICE',d:'Treasury bills maturing within three months; the closest an ETF gets to cash.',k:['~30','Market value','US T-bills'],e:[
+['SGOV','iShares 0-3 Month Treasury Bond ETF','iShares',0.09,'t',''],
+['VBIL','Vanguard 0-3 Month Treasury Bill ETF','Vanguard',0.06,'v','Bloomberg T-bill index; fee cut Feb 2026'],
+['BIL','SPDR Bloomberg 1-3 Month T-Bill ETF','State Street',0.1356,'v','Bloomberg 1-3 Month T-Bill']]},
+{id:'iboxx-ig',n:'iBoxx USD Liquid Investment Grade',c:'bond',p:'S&P Global (iBoxx)',d:'The most liquid US-dollar investment-grade corporate bonds.',k:['~2,800','Market value','US IG corporates'],e:[
+['LQD','iShares iBoxx $ Investment Grade Corporate Bond ETF','iShares',0.14,'t','']]},
+{id:'iboxx-hy',n:'iBoxx USD Liquid High Yield',c:'bond',p:'S&P Global (iBoxx)',d:'Liquid US-dollar corporate bonds rated below investment grade.',k:['~1,200','Market value','US high yield'],e:[
+['HYG','iShares iBoxx $ High Yield Corporate Bond ETF','iShares',0.49,'t','The most traded high-yield ETF'],
+['JNK','SPDR Bloomberg High Yield Bond ETF','State Street',0.40,'v','Bloomberg High Yield Very Liquid'],
+['USHY','iShares Broad USD High Yield Corporate Bond ETF','iShares',0.08,'v','ICE BofA US High Yield Constrained']]},
+{id:'us-tips',n:'Bloomberg US TIPS',c:'bond',p:'Bloomberg',d:'Treasury Inflation-Protected Securities, whose principal rises with CPI.',k:['~50','Market value','US inflation-linked'],e:[
+['SCHP','Schwab U.S. TIPS ETF','Schwab',0.03,'t',''],
+['VTIP','Vanguard Short-Term Inflation-Protected Securities ETF','Vanguard',0.03,'v','0-5 year TIPS only'],
+['TIP','iShares TIPS Bond ETF','iShares',0.18,'v','ICE US Treasury Inflation Linked index']]},
+{id:'us-muni',n:'S&P National AMT-Free Municipal Bond',c:'bond',p:'S&P DJI',d:'Investment-grade, tax-exempt US municipal bonds that are not subject to the alternative minimum tax.',k:['Thousands','Market value','US tax-exempt'],e:[
+['VTEB','Vanguard Tax-Exempt Bond ETF','Vanguard',0.03,'t',''],
+['MUB','iShares National Muni Bond ETF','iShares',0.05,'v','ICE AMT-Free US National Municipal']]},
+{id:'us-mbs',n:'Bloomberg US MBS',c:'bond',p:'Bloomberg',d:'Agency mortgage-backed pass-throughs from Ginnie Mae, Fannie Mae and Freddie Mac.',k:['Thousands','Market value','US agency MBS'],e:[
+['MBB','iShares MBS ETF','iShares',0.04,'t',''],
+['VMBS','Vanguard Mortgage-Backed Securities ETF','Vanguard',0.03,'v','Float-adjusted version'],
+['SMBS','Schwab Mortgage-Backed Securities ETF','Schwab',0.03,'v','Similar agency MBS index']]},
+{id:'global-agg-ex-usd',n:'Bloomberg Global Aggregate ex-USD (hedged)',c:'bond',p:'Bloomberg',d:'Investment-grade bonds issued outside the US dollar, with the currency hedged back to dollars.',k:['Thousands','Market value','Global ex-US IG'],e:[
+['BNDX','Vanguard Total International Bond ETF','Vanguard',0.07,'t','Float-adjusted, capped version'],
+['IAGG','iShares Core International Aggregate Bond ETF','iShares',0.07,'t','Issuer-capped version']]},
+{id:'jpm-embi',n:'J.P. Morgan EMBI Global Core',c:'bond',p:'J.P. Morgan',d:'US-dollar bonds from emerging-market governments and state-owned companies.',k:['~600','Capped market value','EM dollar debt'],e:[
+['EMB','iShares J.P. Morgan USD Emerging Markets Bond ETF','iShares',0.39,'t','']]},
+
+{id:'hedge-multi-strategy',n:'NYLI Hedge Multi-Strategy',c:'alt',p:'New York Life (IndexIQ)',d:'Copies a multi-strategy hedge fund-of-funds with liquid ETFs: long/short equity, macro, merger arbitrage and more.',k:['ETF basket','Rules-based replication','Global multi-asset'],e:[
+['QAI','NYLI Hedge Multi-Strategy Tracker ETF','New York Life',0.88,'t','Branded IndexIQ until Aug 2024']]},
+{id:'sg-cta',n:'SG CTA Index',c:'alt',p:'Société Générale',d:'Daily returns of 20 of the largest managed-futures (trend-following) hedge funds. Replicators copy their positions with futures.',k:['20 managers','Equal-weighted','Global futures'],e:[
+['DBMF','iMGP DBi Managed Futures Strategy ETF','iMGP / DBi',0.85,'v','Aims for the index\'s pre-fee returns using futures']]},
+{id:'kfa-mlm',n:'KFA MLM Index',c:'alt',p:'Mount Lucas / KraneShares',d:'A rules-based trend-following index across commodity, currency and bond futures.',k:['Futures basket','Risk-weighted','Global futures'],e:[
+['KMLM','KraneShares Mount Lucas Managed Futures Index Strategy ETF','KraneShares',0.90,'t','']]},
+{id:'guru',n:'Solactive Guru Index',c:'alt',p:'Solactive',d:'Top picks disclosed in 13F filings by a group of high-conviction hedge funds, equal-weighted.',k:['~60','Equal-weighted','US equity'],e:[
+['GURU','Global X Guru Index ETF','Global X',0.75,'t','']]},
+{id:'cboe-bxm',n:'Cboe S&P 500 BuyWrite (BXM)',c:'alt',p:'Cboe',d:'Owns the S&P 500 and sells one-month at-the-money calls each month: more income, capped upside.',k:['S&P 500 + calls','Options overlay','US large cap'],e:[
+['XYLD','Global X S&P 500 Covered Call ETF','Global X',0.60,'t','']]},
+
+{id:'gold',n:'LBMA Gold Price',c:'real',p:'LBMA / ICE',d:'Physically backed gold, valued at the twice-daily London auction price.',k:['Vaulted bullion','Physical metal','Gold'],e:[
+['GLD','SPDR Gold Shares','State Street',0.40,'t','The largest gold ETF, with deep options'],
+['IAU','iShares Gold Trust','iShares',0.25,'t',''],
+['GLDM','SPDR Gold MiniShares','State Street',0.10,'t',''],
+['IAUM','iShares Gold Trust Micro','iShares',0.09,'t',''],
+['SGOL','abrdn Physical Gold Shares ETF','abrdn',0.17,'t',''],
+['BAR','GraniteShares Gold Trust','GraniteShares',0.1749,'t','']]},
+{id:'silver',n:'LBMA Silver Price',c:'real',p:'LBMA',d:'Physically backed silver, valued at the daily London auction price.',k:['Vaulted bullion','Physical metal','Silver'],e:[
+['SLV','iShares Silver Trust','iShares',0.50,'t',''],
+['SIVR','abrdn Physical Silver Shares ETF','abrdn',0.30,'t','']]},
+{id:'bcom',n:'Bloomberg Commodity Index',c:'real',p:'Bloomberg',d:'A diversified basket of commodity futures; no sector may pass a third of the index.',k:['~24 futures','Liquidity & production','Diversified commodities'],e:[
+['BCI','abrdn Bloomberg All Commodity Strategy K-1 Free ETF','abrdn',0.26,'t','No K-1 tax form'],
+['CMDY','iShares Bloomberg Roll Select Commodity Strategy ETF','iShares',0.28,'v','Roll Select variant: chooses futures to limit roll costs'],
+['DJP','iPath Bloomberg Commodity Index Total Return ETN','iPath (Barclays)',0.70,'t','An ETN, so it carries Barclays credit risk']]},
+{id:'sp-gsci',n:'S&P GSCI',c:'real',p:'S&P DJI',d:'Commodity futures weighted by world production, so energy usually makes up more than half.',k:['~24 futures','Production-weighted','Energy-heavy commodities'],e:[
+['GSG','iShares S&P GSCI Commodity-Indexed Trust','iShares',0.75,'t','']]},
+{id:'bitcoin',n:'CME CF Bitcoin Reference Rate',c:'real',p:'CF Benchmarks',d:'A once-a-day bitcoin price built from trades on major spot exchanges; most spot bitcoin ETFs value their coins with it.',k:['Spot bitcoin','Single asset','Crypto'],e:[
+['IBIT','iShares Bitcoin Trust ETF','iShares',0.25,'t','The largest spot bitcoin ETF'],
+['BITB','Bitwise Bitcoin ETF','Bitwise',0.20,'t',''],
+['ARKB','ARK 21Shares Bitcoin ETF','21Shares / ARK',0.21,'t',''],
+['FBTC','Fidelity Wise Origin Bitcoin Fund','Fidelity',0.25,'v','Uses Fidelity\'s own bitcoin reference rate'],
+['BTC','Grayscale Bitcoin Mini Trust ETF','Grayscale',0.15,'v','Uses the CoinDesk Bitcoin Price Index'],
+['GBTC','Grayscale Bitcoin Trust ETF','Grayscale',1.50,'v','Uses the CoinDesk index; fee left over from its trust days']]},
+{id:'us-reits',n:'MSCI US IMI Real Estate 25/50',c:'real',p:'MSCI',d:'US real estate stocks, mostly REITs, across all sizes with 25/50 concentration limits.',k:['~150','Capped float cap','US real estate'],e:[
+['VNQ','Vanguard Real Estate ETF','Vanguard',0.13,'t',''],
+['SCHH','Schwab U.S. REIT ETF','Schwab',0.07,'v','Dow Jones Equity All REIT Capped'],
+['XLRE','Real Estate Select Sector SPDR Fund','State Street',0.08,'v','S&P 500 real estate stocks only']]}
+];
+
+
+const R=(()=>{
+const RAW=`1928,43.81,3.08,0.84,3.22,1.49,0.10
+1929,-8.30,3.16,4.20,3.02,-2.06,-0.15
+1930,-25.12,4.55,4.54,0.54,-4.30,0.10
+1931,-43.84,2.31,-2.56,-15.68,-8.15,-17.38
+1932,-8.64,1.07,8.79,23.59,-10.47,21.28
+1933,49.98,0.96,1.86,12.97,-3.81,27.26
+1934,-1.19,0.28,7.96,18.82,2.91,31.75
+1935,46.74,0.17,4.47,13.31,9.77,0.43
+1936,31.94,0.17,5.02,11.38,3.22,0.09
+1937,-35.34,0.28,1.38,-4.42,2.56,-0.23
+1938,29.28,0.07,4.21,9.24,-0.87,0.17
+1939,-1.10,0.05,4.41,7.98,-1.30,-1.23
+1940,-10.67,0.04,5.40,8.65,3.31,-1.66
+1941,-12.77,0.13,-2.02,5.01,-8.38,0.00
+1942,19.17,0.34,2.29,5.18,3.33,0.00
+1943,25.06,0.38,2.49,8.04,11.45,0.00
+1944,19.03,0.38,2.58,6.57,16.58,0.00
+1945,35.82,0.38,3.80,6.80,11.78,2.54
+1946,-8.43,0.38,3.13,2.51,24.10,0.00
+1947,5.20,0.60,0.92,0.26,21.26,0.00
+1948,5.70,1.05,1.95,3.44,2.06,0.00
+1949,18.30,1.12,4.66,5.38,0.09,-8.70
+1950,30.81,1.20,0.43,4.24,3.64,9.56
+1951,23.68,1.52,-0.30,-0.19,6.05,0.00
+1952,18.15,1.72,2.27,4.44,4.41,-0.35
+1953,-1.21,1.89,4.14,1.62,11.52,0.69
+1954,52.56,0.94,3.29,6.16,0.92,0.57
+1955,32.60,1.72,-1.34,2.04,0.00,-0.03
+1956,7.44,2.62,-2.26,-2.35,0.91,-0.11
+1957,-10.46,3.22,6.80,-0.72,2.72,-0.11
+1958,43.72,1.77,-2.10,6.43,0.66,0.43
+1959,12.06,3.39,-2.65,1.57,0.11,0.00
+1960,0.34,2.87,11.64,6.66,0.77,0.48
+1961,26.64,2.35,2.06,5.10,0.98,-0.06
+1962,-8.81,2.77,5.69,6.50,0.32,-0.06
+1963,22.61,3.16,1.68,5.46,2.14,-0.40
+1964,16.42,3.55,3.73,5.16,1.26,0.03
+1965,12.40,3.95,0.72,3.19,1.66,0.06
+1966,-9.97,4.86,2.91,-3.45,1.22,0.03
+1967,23.80,4.29,-1.58,0.90,2.32,-0.51
+1968,10.81,5.34,3.27,4.85,4.13,12.47
+1969,-8.24,6.67,-5.01,-2.03,6.99,5.01
+1970,3.56,6.39,16.75,5.65,8.22,-9.45
+1971,14.22,4.33,9.79,14.00,4.24,16.69
+1972,18.76,4.06,2.82,11.41,2.98,48.78
+1973,-14.31,7.04,3.66,4.32,3.42,72.96
+1974,-25.90,7.85,1.99,-4.38,10.07,66.15
+1975,37.00,5.79,3.61,11.05,6.77,-24.80
+1976,23.83,4.98,15.98,19.75,8.18,-4.10
+1977,-6.98,5.26,1.29,9.95,14.65,22.64
+1978,6.51,7.18,-0.78,3.14,15.72,37.01
+1979,18.52,10.05,0.67,-2.01,13.74,126.55
+1980,31.74,11.39,-2.99,-3.32,7.40,15.19
+1981,-4.70,14.04,8.20,8.46,5.10,-32.60
+1982,20.42,11.09,32.81,29.05,0.56,15.62
+1983,22.34,8.95,3.20,16.19,4.75,-16.80
+1984,6.15,9.92,13.73,15.62,4.68,-19.38
+1985,31.24,7.72,25.71,23.86,7.47,6.00
+1986,18.49,6.15,24.28,22.15,9.61,18.96
+1987,5.81,5.96,-4.96,1.12,7.85,24.53
+1988,16.54,6.89,8.22,15.68,7.22,-15.26
+1989,31.48,8.39,17.69,16.31,4.39,-2.84
+1990,-3.06,7.75,6.24,5.65,-0.69,-3.11
+1991,30.23,5.54,15.00,16.40,-0.17,-8.56
+1992,7.49,3.51,9.36,13.68,0.82,-5.73
+1993,9.97,3.07,14.21,16.44,2.16,17.68
+1994,1.33,4.37,-8.04,-1.23,2.52,-2.17
+1995,37.20,5.66,23.48,20.09,1.79,0.98
+1996,22.68,5.15,1.43,5.28,2.43,-4.59
+1997,33.10,5.20,9.94,11.30,4.02,-21.41
+1998,28.34,4.91,14.92,8.10,6.44,-0.83
+1999,20.89,4.78,-8.25,0.97,7.68,0.85
+2000,-9.03,6.00,16.66,9.38,9.29,-5.44
+2001,-11.85,3.48,5.57,8.60,6.68,0.75
+2002,-21.97,1.64,15.12,12.06,9.56,25.57
+2003,28.36,1.03,0.38,12.38,9.81,19.89
+2004,10.74,1.40,4.49,10.33,13.64,4.65
+2005,4.83,3.22,2.87,5.13,13.51,17.77
+2006,15.61,4.85,1.96,5.27,1.73,23.20
+2007,5.48,4.48,10.21,4.90,-5.40,31.92
+2008,-36.55,1.40,20.10,-3.44,-12.00,4.32
+2009,25.94,0.15,-11.12,19.96,-3.85,25.04
+2010,14.82,0.14,8.46,9.40,-4.12,29.24
+2011,2.10,0.05,16.04,12.26,-3.89,12.02
+2012,15.89,0.09,2.97,9.40,6.44,5.68
+2013,32.15,0.06,-9.10,-1.13,10.72,-27.61
+2014,13.52,0.03,10.75,10.75,4.50,0.12
+2015,1.38,0.05,1.28,-1.50,5.19,-12.11
+2016,11.77,0.32,0.69,11.52,5.31,8.10
+2017,21.61,0.95,2.80,9.15,6.21,12.66
+2018,-4.23,1.97,-0.02,-3.18,4.52,-0.93
+2019,31.21,2.11,9.64,15.25,3.69,19.08
+2020,18.02,0.36,11.33,10.60,10.43,24.17
+2021,28.47,0.04,-4.42,1.02,18.86,-3.75
+2022,-18.04,2.09,-17.83,-15.23,5.65,0.55
+2023,26.06,5.28,3.88,8.74,5.68,13.26
+2024,24.88,5.18,-1.64,1.74,3.96,25.96
+2025,17.78,4.21,7.80,6.96,1.58,66.22`;
+const ROWS=RAW.trim().split(/\s+/).map(l=>l.split(',').map(Number));
+const Y0=ROWS[0][0],Y1=ROWS[ROWS.length-1][0];
+const AS=[['S&P 500','S&P 500 (incl. dividends)','--s1'],['T-bills','3-month T-bill','--s2'],['T-bonds','10-year US T-bond','--s3'],['Baa corp.','Baa corporate bond','--s6'],['Real estate','US real estate','--s5'],['Gold','Gold','--s4']];
+const rs={a:0,y0:Y0,y1:Y1};
+const g=id=>document.getElementById(id);
+const fp=(v,d=2)=>(v>0?'+':'')+v.toFixed(d)+'%';
+const pp=v=>v.toFixed(2)+'%';
+const money=v=>v>=1e6?'$'+(v/1e6).toFixed(v>=1e7?1:2)+'M':v>=1e4?'$'+(v/1e3).toFixed(v>=1e5?0:1)+'K':'$'+Math.round(v).toLocaleString('en-US');
+function slice(){return ROWS.filter(r=>r[0]>=rs.y0&&r[0]<=rs.y1)}
+function stats(rows,c){
+  const v=rows.map(r=>r[c+1]/100),n=v.length;
+  const a=v.reduce((s,x)=>s+x,0)/n;
+  const gr=v.reduce((s,x)=>s*(1+x),1);
+  const gm=gr**(1/n)-1;
+  const sd=n>1?Math.sqrt(v.reduce((s,x)=>s+(x-a)**2,0)/(n-1)):0;
+  let bi=0,wi=0;v.forEach((x,i)=>{if(x>v[bi])bi=i;if(x<v[wi])wi=i});
+  return {n,a:a*100,g:gm*100,sd:sd*100,best:[rows[bi][0],v[bi]*100],worst:[rows[wi][0],v[wi]*100],up:v.filter(x=>x>0).length/n*100,end:100*gr};
+}
+const css=k=>getComputedStyle(g('rview')).getPropertyValue(k).trim();
+const yOpts=()=>ROWS.map(r=>'<option>'+r[0]+'</option>').join('');
+g('ry0').innerHTML=yOpts();g('ry1').innerHTML=yOpts();
+function controls(){
+  g('achips').innerHTML=AS.map((s,i)=>'<button class="achip'+(i===rs.a?' on':'')+'" data-a="'+i+'" style="--sc:var('+s[2]+')"><i></i>'+s[0]+'</button>').join('');
+  g('ry0').value=rs.y0;g('ry1').value=rs.y1;
+  const span=rs.y1-rs.y0+1;
+  document.querySelectorAll('.pre').forEach(b=>{const p=b.dataset.pre;b.classList.toggle('on',rs.y1===Y1&&(p==='all'?rs.y0===Y0:span===+p))});
+}
+function render(){
+  controls();
+  const rows=slice(),s=stats(rows,rs.a),A=AS[rs.a];
+  g('rtitle').textContent=A[1]+': '+pp(s.g)+' a year compounded, '+rs.y0+'–'+rs.y1;
+  g('bt').textContent='Yearly returns: '+A[0];
+  g('rstats').innerHTML=[
+    ['key','Geometric average',pp(s.g),'compound annual growth'],
+    ['','Arithmetic average',pp(s.a),'simple mean of years'],
+    ['','Std. deviation',pp(s.sd),'of annual returns'],
+    ['','Best year',fp(s.best[1]),String(s.best[0])],
+    ['','Worst year',fp(s.worst[1]),String(s.worst[0])],
+    ['','$100 grew to',money(s.end),s.up.toFixed(0)+'% of years positive']
+  ].map(c=>'<div class="stat '+c[0]+'"><span>'+c[1]+'</span><b>'+c[2]+'</b><small>'+c[3]+'</small></div>').join('');
+  // table
+  const all=AS.map((_,i)=>stats(rows,i));
+  const head='<thead><tr><th>Asset</th><th>Geometric</th><th>Arithmetic</th><th>Std. dev.</th><th>Worst year</th><th>Best year</th><th>$100 grew to</th></tr></thead>';
+  const body=AS.map((x,i)=>{const t=all[i];return '<tr class="'+(i===rs.a?'on':'')+'" style="--sc:var('+x[2]+')"><td><i></i>'+x[0]+'</td><td>'+pp(t.g)+'</td><td>'+pp(t.a)+'</td><td>'+pp(t.sd)+'</td><td>'+fp(t.worst[1])+' ('+t.worst[0]+')</td><td>'+fp(t.best[1])+' ('+t.best[0]+')</td><td>'+money(t.end)+'</td></tr>'}).join('');
+  const prem=[[1,'Stocks minus T-bills'],[2,'Stocks minus T-bonds'],[3,'Stocks minus Baa bonds']].map(([j,l])=>'<tr class="prem"><td>'+l+'</td><td>'+fp(all[0].g-all[j].g)+'</td><td>'+fp(all[0].a-all[j].a)+'</td><td></td><td></td><td></td><td></td></tr>').join('');
+  g('rtbl').innerHTML=head+'<tbody>'+body+prem+'</tbody>';
+  g('leg').innerHTML=AS.map(x=>'<span style="--sc:var('+x[2]+')"><i></i>'+x[0]+'</span>').join('');
+  drawBar();drawGrowth();
+}
+function niceStep(range){return range>150?40:range>80?20:range>30?10:range>12?5:range>5?2:1}
+function drawBar(){
+  const svg=g('sbar'),W=svg.clientWidth,H=svg.clientHeight;if(!W)return;
+  const rows=slice(),c=rs.a+1,s=stats(rows,rs.a),narrow=W<520;
+  const m={l:40,r:narrow?8:64,t:12,b:24};
+  const vals=rows.map(r=>r[c]);
+  let lo=Math.min(0,...vals),hi=Math.max(0,...vals);
+  const st=niceStep(hi-lo);lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi===lo)hi=lo+st;
+  const iw=W-m.l-m.r,ih=H-m.t-m.b,bw=iw/rows.length;
+  const y=v=>m.t+(hi-v)/(hi-lo)*ih,x=i=>m.l+i*bw;
+  let o='';
+  for(let v=lo;v<=hi+1e-9;v+=st){o+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="'+(v===0?css('--mute'):css('--line'))+'" stroke-width="1"/><text x="'+(m.l-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+v+'%</text>'}
+  const pos=css('--pos'),neg=css('--neg'),gap=Math.min(2,bw*0.25);
+  rows.forEach((r,i)=>{const v=r[c],y0=y(Math.max(v,0)),h=Math.max(Math.abs(y(v)-y(0)),1);
+    o+='<rect x="'+(x(i)+gap/2).toFixed(2)+'" y="'+y0.toFixed(2)+'" width="'+Math.max(bw-gap,0.8).toFixed(2)+'" height="'+h.toFixed(2)+'" rx="'+(bw>6?2:0)+'" fill="'+(v>=0?pos:neg)+'"/>'});
+  const yt=narrow?(rows.length>40?25:10):(rows.length>60?10:rows.length>20?5:1);
+  rows.forEach((r,i)=>{if((r[0]%yt===0)||rows.length<=12)o+='<text x="'+(x(i)+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+r[0]+'</text>'});
+  const ink=css('--ink');
+  let gy=y(s.g),ay=y(s.a);
+  o+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+gy+'" y2="'+gy+'" stroke="'+ink+'" stroke-width="2" stroke-dasharray="6 4"/>';
+  o+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+ay+'" y2="'+ay+'" stroke="'+ink+'" stroke-width="2" stroke-dasharray="2 3"/>';
+  if(!narrow){let ly=gy,la=ay;if(Math.abs(la-ly)<15){if(la<ly)la=ly-15;else la=ly+15}
+    o+='<text class="lbl" x="'+(W-m.r+6)+'" y="'+(ly+4)+'">Geo '+s.g.toFixed(1)+'%</text><text class="lbl" x="'+(W-m.r+6)+'" y="'+(la+4)+'">Avg '+s.a.toFixed(1)+'%</text>'}
+  o+='<rect id="hb" x="'+m.l+'" y="'+m.t+'" width="'+iw+'" height="'+ih+'" fill="transparent"/>';
+  svg.innerHTML=o;
+  const tip=g('tbar');
+  const hb=svg.querySelector('#hb');
+  const mv=e=>{const b=svg.getBoundingClientRect(),px=(e.touches?e.touches[0].clientX:e.clientX)-b.left;const i=Math.min(rows.length-1,Math.max(0,Math.floor((px-m.l)/bw)));const r=rows[i];
+    tip.hidden=false;tip.innerHTML='<b>'+r[0]+'</b><div><span>'+AS[rs.a][0]+'</span><span>'+fp(r[c])+'</span></div>';
+    const tx=Math.min(Math.max(x(i)+bw/2-tip.offsetWidth/2,0),W-tip.offsetWidth);tip.style.left=tx+'px';tip.style.top=Math.max(y(Math.max(r[c],0))-tip.offsetHeight-8,0)+'px'};
+  hb.addEventListener('mousemove',mv);hb.addEventListener('touchstart',mv,{passive:true});hb.addEventListener('touchmove',mv,{passive:true});
+  hb.addEventListener('mouseleave',()=>tip.hidden=true);
+}
+function drawGrowth(){
+  const svg=g('sgr'),W=svg.clientWidth,H=svg.clientHeight;if(!W)return;
+  const rows=slice(),narrow=W<420;
+  const ser=AS.map((a,i)=>{let v=100;const p=[[rows[0][0]-1,100]];rows.forEach(r=>{v*=1+r[i+1]/100;p.push([r[0],v])});return p});
+  const all=ser.flat().map(p=>p[1]);
+  const lmin=Math.floor(Math.log10(Math.min(...all))),lmax=Math.ceil(Math.log10(Math.max(...all)));
+  const m={l:48,r:narrow?10:92,t:10,b:24},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const xa=rows[0][0]-1,xb=rows[rows.length-1][0];
+  const x=yr=>m.l+(yr-xa)/(xb-xa||1)*iw,y=v=>m.t+(lmax-Math.log10(v))/(lmax-lmin||1)*ih;
+  let o='';
+  for(let k=lmin;k<=lmax;k++){const v=10**k;o+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="'+css('--line')+'"/><text x="'+(m.l-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+money(v).replace('.00M','M').replace('.0K','K')+'</text>'}
+  const span=xb-xa,xt=span>60?(narrow?40:20):span>20?10:span>8?2:1;
+  for(let yr=Math.ceil(xa/xt)*xt;yr<=xb;yr+=xt)o+='<text x="'+x(yr)+'" y="'+(H-6)+'" text-anchor="middle">'+yr+'</text>';
+  const order=ser.map((p,i)=>i).sort((a,b)=>(a===rs.a)-(b===rs.a));
+  order.forEach(i=>{const p=ser[i];o+='<path d="'+p.map((q,j)=>(j?'L':'M')+x(q[0]).toFixed(1)+' '+y(q[1]).toFixed(1)).join('')+'" fill="none" stroke="'+css(AS[i][2])+'" stroke-width="'+(i===rs.a?3:2)+'" stroke-linejoin="round" opacity="'+(i===rs.a?1:.85)+'"/>'});
+  if(!narrow){const ends=ser.map((p,i)=>({i,y:y(p[p.length-1][1]),v:p[p.length-1][1]})).sort((a,b)=>a.y-b.y);
+    for(let k=1;k<ends.length;k++)if(ends[k].y-ends[k-1].y<14)ends[k].y=ends[k-1].y+14;
+    const over=ends[ends.length-1].y-(H-m.b);if(over>0)ends.forEach(e=>e.y-=over);
+    ends.forEach(e=>o+='<text class="lbl" x="'+(W-m.r+6)+'" y="'+(e.y+4)+'">'+AS[e.i][0]+' '+money(e.v)+'</text>')}
+  o+='<line id="cx" y1="'+m.t+'" y2="'+(H-m.b)+'" stroke="'+css('--mute')+'" stroke-dasharray="3 3" visibility="hidden"/><rect id="hg" x="'+m.l+'" y="'+m.t+'" width="'+iw+'" height="'+ih+'" fill="transparent"/>';
+  svg.innerHTML=o;
+  const tip=g('tgr'),cx=svg.querySelector('#cx'),hg=svg.querySelector('#hg');
+  const mv=e=>{const b=svg.getBoundingClientRect(),px=(e.touches?e.touches[0].clientX:e.clientX)-b.left;
+    let yr=Math.round(xa+(px-m.l)/iw*(xb-xa));yr=Math.min(xb,Math.max(xa,yr));const j=yr-xa;
+    cx.setAttribute('x1',x(yr));cx.setAttribute('x2',x(yr));cx.setAttribute('visibility','visible');
+    tip.hidden=false;tip.innerHTML='<b>End of '+yr+'</b>'+ser.map((p,i)=>({i,v:p[j][1]})).sort((a,b)=>b.v-a.v).map(q=>'<div><span><i style="background:'+css(AS[q.i][2])+'"></i>'+AS[q.i][0]+'</span><span>'+money(q.v)+'</span></div>').join('');
+    const tx=x(yr)>W/2?x(yr)-tip.offsetWidth-10:x(yr)+10;tip.style.left=Math.max(0,tx)+'px';tip.style.top=m.t+'px'};
+  hg.addEventListener('mousemove',mv);hg.addEventListener('touchstart',mv,{passive:true});hg.addEventListener('touchmove',mv,{passive:true});
+  hg.addEventListener('mouseleave',()=>{tip.hidden=true;cx.setAttribute('visibility','hidden')});
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-a]');if(a){rs.a=+a.dataset.a;render();return}
+  const p=e.target.closest('[data-pre]');if(p){rs.y1=Y1;rs.y0=p.dataset.pre==='all'?Y0:Y1-(+p.dataset.pre)+1;render()}
+});
+g('ry0').addEventListener('change',e=>{rs.y0=+e.target.value;if(rs.y0>rs.y1)rs.y1=rs.y0;render()});
+g('ry1').addEventListener('change',e=>{rs.y1=+e.target.value;if(rs.y1<rs.y0)rs.y0=rs.y1;render()});
+const ro=new ResizeObserver(()=>{if(!g('rview').hidden){drawBar();drawGrowth()}});
+ro.observe(g('fbar'));ro.observe(g('fgr'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!g('rview').hidden)render()});
+new MutationObserver(()=>{if(!g('rview').hidden)render()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+return {show:render};
+})();
+
+const W=(()=>{
+const YRS=Array.from({length:21},(_,i)=>2006+i),N=20,YTD=2026,ASOF='Oct 30, 2026';
+const yl=y=>y===YTD?'2026 YTD':String(y);
+// [id, short, full name, group, basis, values 2006..2025]
+const IX=[
+['sp','S&P 500','S&P 500','us','Total return',[15.79,5.49,-37.00,26.46,15.06,2.11,16.00,32.39,13.69,1.38,11.96,21.83,-4.38,31.49,18.40,28.71,-18.11,26.29,25.02,17.88,10.73]],
+['dow','Dow','Dow Jones Industrial Average','us','Price only',[16.29,6.43,-33.84,18.82,11.02,5.53,7.26,26.50,7.52,-2.23,13.42,25.08,-5.63,22.34,7.25,18.73,-8.78,13.70,12.88,12.97,7.71]],
+['ndx','Nasdaq-100','Nasdaq-100','us','Price only',[6.79,18.67,-41.89,53.54,19.22,2.70,16.82,34.99,17.94,8.43,5.89,31.52,-1.04,37.96,47.58,26.63,-32.97,53.81,24.88,20.17,12.42]],
+['r2k','Russell 2000','Russell 2000','us','Total return',[18.37,-1.57,-33.79,27.17,26.85,-4.18,16.35,38.82,4.89,-4.41,21.31,14.65,-11.01,25.52,19.96,14.82,-20.44,16.93,11.54,12.81,14.4]],
+['acwi','ACWI','MSCI ACWI','global','Net, USD',[20.95,11.66,-42.19,34.63,12.67,-7.35,16.13,22.80,4.16,-2.36,7.86,23.97,-9.41,26.60,16.25,18.54,-18.36,22.20,17.49,22.34,11.18]],
+['world','World','MSCI World','global','Net, USD',[20.07,9.04,-40.71,29.99,11.76,-5.54,15.83,26.68,4.94,-0.87,7.51,22.40,-8.71,27.67,15.90,21.82,-18.14,23.79,18.67,21.09,10.89]],
+['eafe','EAFE','MSCI EAFE','global','Gross, USD',[26.86,11.63,-43.06,32.46,8.21,-11.73,17.90,23.29,-4.48,-0.39,1.51,25.62,-13.36,22.66,8.28,11.78,-14.01,18.85,4.35,31.89,9.52]],
+['em','EM','MSCI Emerging Markets','global','Gross, USD',[32.55,39.82,-53.18,79.02,19.20,-18.17,18.63,-2.27,-1.82,-14.60,11.60,37.75,-14.25,18.88,18.69,-2.22,-19.74,10.27,8.05,34.36,13.45]],
+['jp','Japan','MSCI Japan','country','Total, USD',[6.33,-4.14,-29.11,6.39,15.59,-14.19,8.36,27.35,-3.72,9.90,2.73,24.39,-12.58,20.07,14.91,2.04,-16.31,20.77,8.68,25.05,17.56]],
+['uk','UK','MSCI United Kingdom','country','Total, USD',[30.66,8.39,-48.32,43.37,8.80,-2.52,15.30,20.71,-5.35,-7.51,-0.04,22.38,-14.10,21.13,-10.43,18.53,-4.83,14.11,7.55,35.12,10.79]],
+['de','Germany','MSCI Germany','country','Total, USD',[36.79,35.93,-45.50,26.56,9.32,-17.45,32.10,32.40,-9.76,-1.27,3.50,28.49,-21.64,21.68,12.29,5.90,-21.62,23.97,11.03,37.08,0.5]],
+['fr','France','MSCI France','country','Total, USD',[35.42,14.03,-42.71,33.26,-3.23,-16.00,22.82,27.66,-8.99,0.78,6.02,29.90,-11.90,26.95,4.70,20.59,-12.67,22.28,-4.60,29.50,-4.48]],
+['ch','Switzerland','MSCI Switzerland','country','Total, USD',[28.23,6.06,-29.90,26.61,12.86,-6.05,21.47,27.56,0.66,1.20,-4.04,23.62,-8.20,33.56,12.78,20.35,-17.60,16.87,-1.02,34.79,9.76]],
+['ca','Canada','MSCI Canada','country','Total, USD',[18.35,30.24,-45.15,57.36,21.21,-12.16,9.90,6.44,2.22,-23.59,25.49,16.90,-16.56,28.50,6.21,26.87,-12.17,16.44,12.74,37.38,13.1]],
+['au','Australia','MSCI Australia','country','Total, USD',[32.51,29.79,-49.96,76.77,14.73,-10.79,22.30,4.34,-3.24,-9.77,11.67,20.15,-11.83,23.15,8.87,9.57,-5.13,14.92,1.34,14.84,14.34]],
+['hk','Hong Kong','MSCI Hong Kong','country','Total, USD',[30.35,41.20,-51.21,60.15,23.23,-16.02,28.27,11.09,5.07,-0.54,2.27,36.17,-7.83,10.34,5.82,-3.91,-4.71,-14.77,0.08,34.83,6.06]],
+['cn','China','MSCI China','country','Total, USD',[82.87,66.23,-50.83,62.63,4.83,-18.24,23.10,3.96,8.26,-7.62,1.11,54.33,-18.75,23.66,29.67,-21.64,-21.80,-11.04,19.67,31.42,-17.91]],
+['in','India','MSCI India','country','Total, USD',[51.00,73.11,-64.63,102.81,20.95,-37.17,25.97,-3.83,23.87,-6.12,-1.43,38.76,-7.30,7.58,15.55,26.23,-7.95,20.81,11.22,2.62,-13.9]],
+['kr','Korea','MSCI Korea','country','Total, USD',[13.19,32.58,-55.07,72.06,27.15,-11.76,21.48,4.18,-10.70,-6.30,9.25,47.80,-20.46,13.10,45.21,-7.92,-28.94,23.59,-23.09,100.76,66.91]],
+['tw','Taiwan','MSCI Taiwan','country','Total, USD',[20.90,9.13,-45.88,80.25,22.73,-20.15,17.66,9.77,10.05,-10.97,19.59,28.51,-8.16,37.69,42.02,26.82,-29.13,31.33,35.07,39.84,55.97]]
+];
+const GR=[['all','All 20'],['us','US'],['global','Global & regional'],['country','Countries']];
+const ws={g:'all',sel:null,yr:2026,sort:'ann',dir:-1,view:'rank'};
+const g=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fp=v=>(v>0?'+':'')+v.toFixed(1)+'%';
+const list=()=>IX.filter(x=>ws.g==='all'||x[3]===ws.g);
+function shade(v){const k=Math.min(Math.abs(v)/40,1),p=Math.round(12+k*78);
+  return 'background:color-mix(in srgb,var('+(v>=0?'--wpos':'--wneg')+') '+p+'%,var(--card2));color:'+(p>55?'#fff':'var(--ink)')}
+function ann(v){v=v.slice(0,N);return (v.reduce((s,x)=>s*(1+x/100),1)**(1/v.length)-1)*100}
+function sd(v){v=v.slice(0,N);const a=v.reduce((s,x)=>s+x,0)/v.length;return Math.sqrt(v.reduce((s,x)=>s+(x-a)**2,0)/(v.length-1))}
+function ranks(L){const r={};L.forEach(x=>r[x[0]]=[]);YRS.forEach((y,i)=>{[...L].sort((a,b)=>b[5][i]-a[5][i]).forEach((x,k)=>r[x[0]].push(k+1))});return r}
+function render(){
+  const L=list(),R=ranks(L);
+  g('wgroups').innerHTML=GR.map(x=>'<button class="pre'+(x[0]===ws.g?' on':'')+'" data-wg="'+x[0]+'">'+x[1]+'</button>').join('');
+  g('wviews').innerHTML=[['rank','Ranked each year'],['grid','Fixed rows']].map(x=>'<button class="pre'+(x[0]===ws.view?' on':'')+'" data-wv="'+x[0]+'">'+x[1]+'</button>').join('');
+  // quilt
+  let h='<div class="qt" style="grid-template-columns:'+(ws.view==='rank'?'2.6em':'8.5em')+' repeat('+YRS.length+',minmax(66px,1fr))"><div class="qh qs"></div>'+YRS.map(y=>'<button class="qh'+(y===ws.yr?' on':'')+(y===YTD?' ytd':'')+'" data-wy="'+y+'">'+yl(y)+'</button>').join('');
+  if(ws.view==='rank'){
+    const cols=YRS.map((y,i)=>[...L].sort((a,b)=>b[5][i]-a[5][i]));
+    for(let k=0;k<L.length;k++){h+='<div class="qr qs">'+(k+1)+'</div>';
+      YRS.forEach((y,i)=>{const x=cols[i][k],v=x[5][i];h+='<button class="qc'+(ws.sel===x[0]?' hi':ws.sel?' dim':'')+'" data-wi="'+x[0]+'" style="'+shade(v)+'" title="'+esc(x[2])+', '+y+': '+fp(v)+'"><b>'+esc(x[1])+'</b><span>'+fp(v)+'</span></button>'})}
+  }else{
+    L.forEach(x=>{h+='<button class="qr qs ql'+(ws.sel===x[0]?' on':'')+'" data-wi="'+x[0]+'">'+esc(x[1])+'</button>';
+      YRS.forEach((y,i)=>{const v=x[5][i];h+='<button class="qc'+(ws.sel===x[0]?' hi':ws.sel?' dim':'')+'" data-wi="'+x[0]+'" style="'+shade(v)+'" title="'+esc(x[2])+', '+y+': '+fp(v)+'"><span>'+fp(v)+'</span><small>#'+R[x[0]][i]+'</small></button>'})});
+  }
+  g('quilt').innerHTML=h+'</div>';
+  // selected profile
+  const s=ws.sel&&IX.find(x=>x[0]===ws.sel);
+  g('wsel').innerHTML=s?(()=>{const r=(R[s[0]]||[]).slice(0,N),v=s[5].slice(0,N);return '<div class="wprof"><div><span class="wk">Selected</span><b>'+esc(s[2])+'</b><small>'+esc(s[4])+'</small></div><div><span class="wk">20-yr annualized</span><b>'+fp(ann(v))+'</b></div><div><span class="wk">2026 YTD</span><b>'+fp(s[5][N])+'</b></div><div><span class="wk">Ranked #1 (2006–25)</span><b>'+r.filter(k=>k===1).length+'×</b></div><div><span class="wk">Ranked last</span><b>'+r.filter(k=>k===L.length).length+'×</b></div><div><span class="wk">Down years</span><b>'+v.filter(x=>x<0).length+' of 20</b></div><button class="pre" data-wi="'+s[0]+'">Clear</button></div>'})():'<p class="whint">Tap any cell to follow one index through every year.</p>';
+  // spotlight
+  const i=YRS.indexOf(ws.yr),sorted=[...L].sort((a,b)=>b[5][i]-a[5][i]);
+  const mx=Math.max(...sorted.map(x=>Math.abs(x[5][i])),1);
+  g('wyt').textContent=(ws.yr===YTD?'2026 so far (to '+ASOF+')':ws.yr)+': '+sorted[0][1]+' led at '+fp(sorted[0][5][i])+', '+sorted[sorted.length-1][1]+' trailed at '+fp(sorted[sorted.length-1][5][i]);
+  g('wyc').innerHTML=YRS.map(y=>'<button class="pre'+(y===ws.yr?' on':'')+'" data-wy="'+y+'">'+yl(y)+'</button>').join('');
+  g('spot').innerHTML=sorted.map((x,k)=>{const v=x[5][i],w=Math.abs(v)/mx*50;
+    return '<div class="srow'+(ws.sel===x[0]?' hi':'')+'" data-wi="'+x[0]+'"><span class="sn">'+(k+1)+'. '+esc(x[1])+(k<3?' <em class="up">winner</em>':k>=sorted.length-3?' <em class="dn">loser</em>':'')+'</span><span class="strack"><i style="'+(v>=0?'left:50%':'right:50%')+';width:'+w.toFixed(1)+'%;background:var('+(v>=0?'--wpos':'--wneg')+')"></i></span><span class="sv">'+fp(v)+'</span></div>'}).join('');
+  // stats table
+  const rows=L.map(x=>{const v=x[5].slice(0,N),r=R[x[0]].slice(0,N);return {x,ytd:x[5][N],ann:ann(v),avg:r.reduce((a,b)=>a+b,0)/r.length,first:r.filter(k=>k===1).length,last:r.filter(k=>k===L.length).length,down:v.filter(z=>z<0).length,best:Math.max(...v),worst:Math.min(...v),sd:sd(v)}});
+  rows.sort((a,b)=>ws.dir*((a[ws.sort]-b[ws.sort])||0));
+  const cols=[['ytd','2026 YTD'],['ann','20-yr annualized'],['avg','Avg. rank'],['first','#1 finishes'],['last','Last place'],['down','Down years'],['best','Best year'],['worst','Worst year'],['sd','Volatility']];
+  g('wtbl').innerHTML='<thead><tr><th>Index</th>'+cols.map(c=>'<th><button data-ws="'+c[0]+'">'+c[1]+(ws.sort===c[0]?(ws.dir<0?' ▾':' ▴'):'')+'</button></th>').join('')+'</tr></thead><tbody>'+
+    rows.map(o=>'<tr class="'+(ws.sel===o.x[0]?'on':'')+'" data-wi="'+o.x[0]+'"><td><b>'+esc(o.x[2])+'</b><small>'+esc(o.x[4])+'</small></td><td>'+fp(o.ytd)+'</td><td>'+fp(o.ann)+'</td><td>'+o.avg.toFixed(1)+'</td><td>'+o.first+'</td><td>'+o.last+'</td><td>'+o.down+'</td><td>'+fp(o.best)+'</td><td>'+fp(o.worst)+'</td><td>'+o.sd.toFixed(1)+'%</td></tr>').join('')+'</tbody>';
+}
+document.addEventListener('click',e=>{
+  if(g('wview').hidden)return;
+  const t=e.target;let b;
+  if(b=t.closest('[data-wg]')){ws.g=b.dataset.wg;if(ws.sel&&!list().some(x=>x[0]===ws.sel))ws.sel=null;render();return}
+  if(b=t.closest('[data-wv]')){ws.view=b.dataset.wv;render();return}
+  if(b=t.closest('[data-wy]')){ws.yr=+b.dataset.wy;render();return}
+  if(b=t.closest('[data-ws]')){const k=b.dataset.ws;if(ws.sort===k)ws.dir=-ws.dir;else{ws.sort=k;ws.dir=(k==='avg'||k==='last'||k==='down'||k==='sd')?1:-1}render();return}
+  if(b=t.closest('[data-wi]')){ws.sel=ws.sel===b.dataset.wi?null:b.dataset.wi;render()}
+});
+return {show:render};
+})();
+
+const COL={us:'#1d5bff',style:'#0e8c79',sector:'#e07400',global:'#0b86b8',world:'#d9303a',bond:'#3f46c9',alt:'#8b3cf0',real:'#a87508'};
+const byId=Object.fromEntries(I.map(x=>[x.id,x]));
+const catName=Object.fromEntries(CATS.map(c=>[c[0],c[1]]));
+const catNote=Object.fromEntries(CATS.map(c=>[c[0],c[2]]));
+const LEV={'2x':'2× daily','3x':'3× daily','-1x':'−1× daily','-2x':'−2× daily','-3x':'−3× daily'};
+const REL={t:'Tracks index',v:'Variant',p:'Proxy',c:'Covered call'};
+const isLev=r=>r in LEV;
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=v=>{let s=(+v).toFixed(4).replace(/0+$/,'');let [a,b='']=s.split('.');if(b.length<2)b=b.padEnd(2,'0');return a+'.'+b+'%'};
+const usd=v=>'$'+Math.round(v).toLocaleString('en-US');
+const $=id=>document.getElementById(id);
+const priced=x=>x.e.filter(e=>!isLev(e[4])&&e[3]!=null);
+const fromEr=x=>{const p=priced(x);return p.length?Math.min(...p.map(e=>e[3])):null};
+const ETFS=I.flatMap(x=>x.e.map(e=>({t:e[0],n:e[1],x})));
+const mq=matchMedia('(max-width:1020px)');
+
+const st={id:'sp500',cat:'all',prov:'',amt:10000,yrs:20,ret:7,mode:'core',open:false};
+try{const s=JSON.parse(localStorage.getItem('etf-atlas2')||'{}');for(const k of ['amt','yrs','ret'])if(k in s)st[k]=s[k]}catch(e){}
+const save=()=>{try{localStorage.setItem('etf-atlas2',JSON.stringify({amt:st.amt,yrs:st.yrs,ret:st.ret}))}catch(e){}};
+const vis=()=>I.filter(x=>!st.prov||x.p===st.prov);
+
+$('meta').textContent=I.length+' indices and '+new Set(ETFS.map(e=>e.t)).size+' ETFs. Fees checked against issuer pages in November 2026.';
+const provs=[...new Set(I.map(x=>x.p))].sort((a,b)=>a.localeCompare(b));
+$('prov').innerHTML='<option value="">All providers</option>'+provs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('');
+
+function renderTabs(){
+  const v=vis();
+  const t=[['all','All',v.length,'']].concat(CATS.map(c=>[c[0],c[1],v.filter(x=>x.c===c[0]).length,COL[c[0]]])).filter(t=>t[2]);
+  $('tabs').innerHTML=t.map(t=>'<button class="tab'+(t[0]===st.cat?' on':'')+'" role="tab" aria-selected="'+(t[0]===st.cat)+'" data-cat="'+t[0]+'"'+(t[3]?' style="--c:'+t[3]+'"':'')+'>'+(t[3]?'<i></i>':'')+esc(t[1])+' <small>'+t[2]+'</small></button>').join('');
+}
+function tile(x){
+  const f=fromEr(x),on=x.id===st.id;
+  return '<button class="tile'+(on?' on':'')+'" data-id="'+x.id+'" style="--c:'+COL[x.c]+'"'+(on?' aria-current="true"':'')+'><span class="tprov">'+esc(x.p)+'</span><span class="tname">'+esc(x.n)+'</span><span class="tstats"><span class="pill">'+x.e.length+' ETF'+(x.e.length>1?'s':'')+'</span>'+(f!=null?'<span class="pill c">from '+pct(f)+'</span>':'')+'</span></button>';
+}
+function renderGrid(){
+  const v=vis();
+  const cats=st.cat==='all'?CATS:CATS.filter(c=>c[0]===st.cat);
+  $('grid').innerHTML=cats.map(c=>{const xs=v.filter(x=>x.c===c[0]);if(!xs.length)return '';
+    return '<section class="gsec" style="--c:'+COL[c[0]]+'"><h2><i></i>'+esc(c[1])+' <small>'+xs.length+'</small></h2><div class="tiles">'+xs.map(tile).join('')+'</div></section>'}).join('')||'<p>No indices for this provider.</p>';
+}
+function renderHead(){
+  const x=byId[st.id],note=catNote[x.c];
+  $('panel').style.setProperty('--c',COL[x.c]);
+  $('phead').innerHTML='<div class="prow"><span>'+esc(catName[x.c])+' · '+esc(x.p)+'</span><button class="close" id="close" aria-label="Close">×</button></div><h2>'+esc(x.n)+'</h2>';
+  $('pinfo').innerHTML='<p class="desc">'+esc(x.d)+'</p>'+(note?'<p class="cnote">'+esc(note)+'</p>':'')+
+   '<dl class="facts"><div><dt>Holdings</dt><dd>'+esc(x.k[0])+'</dd></div><div><dt>Weighting</dt><dd>'+esc(x.k[1])+'</dd></div><div><dt>Coverage</dt><dd>'+esc(x.k[2])+'</dd></div></dl>';
+  const lv=x.e.filter(e=>isLev(e[4])).length,cn=x.e.length-lv;
+  if(!lv)st.mode='core';
+  $('seg').className='seg'+(lv?'':' one');
+  $('seg').innerHTML=lv?'<button data-mode="core" class="'+(st.mode==='core'?'on':'')+'">Index funds ('+cn+')</button><button data-mode="lev" class="'+(st.mode==='lev'?'on':'')+'">Leveraged & inverse ('+lv+')</button>':'<h3>'+cn+' fund'+(cn>1?'s':'')+' tracking this index</h3>';
+  $('levnote').hidden=st.mode!=='lev';
+}
+function renderCalc(){
+  const x=byId[st.id],P=st.amt,n=st.yrs,r=st.ret/100;
+  const cost=er=>P*((1+r)**n-((1+r)*(1-er/100))**n);
+  const p=priced(x).slice().sort((a,b)=>a[3]-b[3]);
+  if(!p.length){$('best').innerHTML='<div class="bk">Fees</div><p>These locally listed funds set fees in their home markets. Check each issuer\'s key information document.</p>'}
+  else{
+    const core=p.filter(e=>e[4]==='t'),cmp=core.length>1?core:p,lo=cmp[0],hi=cmp[cmp.length-1],b=p[0];
+    let line;
+    if(p.length===1)line='Fee cost on '+usd(P)+' over '+n+' yrs: <b>'+usd(cost(b[3]))+'</b>';
+    else if(hi[3]===lo[3])line='All charge the same. Fee cost on '+usd(P)+' over '+n+' yrs: <b>'+usd(cost(lo[3]))+'</b>';
+    else line='Choosing '+esc(lo[0])+' over '+esc(hi[0])+' keeps <b>'+usd(cost(hi[3])-cost(lo[3]))+'</b> more of '+usd(P)+' over '+n+' yrs';
+    $('best').innerHTML='<div class="bk">Lowest-cost way in'+(b[4]!=='t'?' ('+REL[b[4]].toLowerCase()+')':'')+'</div><div class="brow"><span class="btick">'+esc(b[0])+'</span><span class="bfee">'+pct(b[3])+'</span></div><p>'+line+'</p>';
+  }
+  const rows=st.mode==='lev'?x.e.filter(e=>isLev(e[4])):x.e.filter(e=>!isLev(e[4])).sort((a,b)=>(a[3]==null)-(b[3]==null)||(a[3]||0)-(b[3]||0));
+  const mx=Math.max(...p.map(e=>e[3]),0.01),min=p.length?p[0][3]:-1;
+  $('list').innerHTML=rows.map(e=>{
+    const sym=e[6]||e[0],best=e[3]===min&&st.mode==='core',lev=isLev(e[4]);
+    const tag=lev?'<span class="tag l">'+LEV[e[4]]+'</span>':best?'<span class="tag b">Lowest fee</span>':e[4]!=='t'?'<span class="tag">'+REL[e[4]]+'</span>':'';
+    const url='https://finance.yahoo.com/quote/'+encodeURIComponent(sym);
+    const open=st.fund===e[0],relx=lev?'Aims for '+LEV[e[4]].replace(' daily','')+' the index\'s daily return':{t:'Holds the index as published',v:'Tracks a close variant of this index',p:'Tracks a different index for the same market',c:'Holds the index and sells call options on it'}[e[4]];
+    const det=open?'<div class="fdet"><dl><div><dt>Index</dt><dd>'+esc(x.n)+'</dd></div><div><dt>Relationship</dt><dd>'+esc(relx)+'</dd></div><div><dt>Expense ratio</dt><dd>'+(e[3]!=null?pct(e[3]):'See issuer')+'</dd></div>'+(e[3]!=null?'<div><dt>Fee per year on '+usd(P)+'</dt><dd>'+usd(P*e[3]/100)+'</dd></div><div><dt>Fee cost over '+n+' years</dt><dd>'+usd(cost(e[3]))+'</dd></div>'+(p.length>1&&!best&&!lev?'<div><dt>Extra vs '+esc(p[0][0])+'</dt><dd>'+usd(cost(e[3])-cost(p[0][3]))+'</dd></div>':''):'')+'<div><dt>Issuer</dt><dd>'+esc(e[2])+'</dd></div><div><dt>Listed</dt><dd>'+esc(e[7]||'US (NYSE / Nasdaq / Cboe)')+'</dd></div></dl><div class="flinks"><a href="'+url+'" target="_blank" rel="noopener">Price &amp; chart on Yahoo Finance ↗</a>'+(e[7]?'':'<a href="https://www.etf.com/'+encodeURIComponent(e[0])+'" target="_blank" rel="noopener">Fund profile on etf.com ↗</a>')+'</div></div>':'';
+    return '<div class="fund'+(best?' isbest':'')+(open?' open':'')+'" role="button" tabindex="0" aria-expanded="'+open+'" data-fund="'+esc(e[0])+'"><span class="ftick">'+esc(e[0])+'</span><div><span class="fname">'+esc(e[1])+'</span><div class="fmeta"><span>'+esc(e[2])+'</span><span>'+esc(e[7]||'US-listed')+'</span>'+tag+'</div></div><div class="ffee"><b>'+(e[3]!=null?pct(e[3]):'—')+'</b><small>'+(e[3]!=null?usd(cost(e[3]))+' / '+n+' yrs':'see issuer')+'</small></div>'+(e[5]?'<div class="fnote">'+esc(e[5])+'</div>':'')+(e[3]!=null?'<div class="fbar"><i style="width:'+Math.max(e[3]/mx*100,2).toFixed(1)+'%"></i></div>':'')+'<span class="chev" aria-hidden="true">'+(open?'Hide details ▴':'Details ▾')+'</span>'+det+'</div>'}).join('');
+}
+function setOpen(o){st.open=o&&mq.matches;$('panel').classList.toggle('open',st.open);$('scrim').classList.toggle('open',st.open);document.body.classList.toggle('lock',st.open)}
+function renderAll(){renderTabs();renderGrid();renderHead();renderCalc()}
+let wantOpen=false;
+function apply(){
+  const h=decodeURIComponent(location.hash.slice(1));
+  const ret=h==='returns',win=h==='winners';
+  $('etfview').hidden=ret||win;$('rview').hidden=!ret;$('wview').hidden=!win;
+  $('v-etf').classList.toggle('on',!ret&&!win);$('v-ret').classList.toggle('on',ret);$('v-win').classList.toggle('on',win);
+  $('subline').textContent=ret?'Annual returns of US stocks, bonds, bills, real estate and gold since 1928.':win?'20 years of equity index returns plus 2026 so far, ranked year by year.':'Tap an index to see every ETF that tracks it, ranked by cost.';
+  $('v-etf').href='#'+st.id;
+  if(ret||win){setOpen(false);document.querySelector('.search').hidden=true;if(ret)R.show();else W.show();return}
+  document.querySelector('.search').hidden=false;
+  if(byId[h]){if(h!==st.id)st.fund=null;st.id=h}
+  if(st.prov&&byId[st.id].p!==st.prov){st.prov='';$('prov').value=''}
+  renderAll();$('panel').scrollTop=0;
+  if(wantOpen)setOpen(true);wantOpen=false;
+}
+function go(id){wantOpen=true;if(location.hash.slice(1)===id)apply();else location.hash=id}
+addEventListener('hashchange',apply);
+document.addEventListener('click',ev=>{
+  const t=ev.target;
+  if(t.closest('#close')||t.id==='scrim'){setOpen(false);return}
+  const b=t.closest('[data-id]');
+  if(b){ev.preventDefault();closeRes();q.value='';go(b.dataset.id);return}
+  const c=t.closest('[data-cat]');
+  if(c){st.cat=c.dataset.cat;renderTabs();renderGrid();scrollTo({top:Math.min(scrollY,$('grid').offsetTop-80)});return}
+  if(t.closest('.fdet a'))return;
+  const f=t.closest('[data-fund]');
+  if(f){st.fund=st.fund===f.dataset.fund?null:f.dataset.fund;renderCalc();const el=document.querySelector('[data-fund="'+CSS.escape(f.dataset.fund)+'"]');if(el&&st.fund&&el.focus)el.focus({preventScroll:true});return}
+  const m=t.closest('[data-mode]');
+  if(m){st.mode=m.dataset.mode;st.fund=null;renderHead();renderCalc();return}
+  if(!t.closest('.search'))closeRes();
+});
+addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);const f=e.target.closest&&e.target.closest('[data-fund]');if(f&&(e.key==='Enter'||e.key===' ')&&e.target===f){e.preventDefault();f.click()}});
+mq.addEventListener('change',()=>setOpen(false));
+$('prov').addEventListener('change',e=>{st.prov=e.target.value;if(st.cat!=='all'&&!vis().some(x=>x.c===st.cat))st.cat='all';renderTabs();renderGrid()});
+
+const amt=$('amt'),yrs=$('yrs'),ret=$('ret');
+amt.value=st.amt;yrs.value=st.yrs;ret.value=st.ret;$('yrsv').textContent=st.yrs;
+amt.addEventListener('input',()=>{const v=parseFloat(amt.value);if(v>0){st.amt=v;save();renderCalc()}});
+yrs.addEventListener('input',()=>{st.yrs=+yrs.value;$('yrsv').textContent=st.yrs;save();renderCalc()});
+ret.addEventListener('input',()=>{const v=parseFloat(ret.value);if(v>=0&&v<=30){st.ret=v;save();renderCalc()}});
+
+const q=$('q'),res=$('results');let hits=[],sel=-1;
+function closeRes(){res.hidden=true;sel=-1}
+function find(s){s=s.trim().toLowerCase();if(!s)return [];
+  const ex=ETFS.filter(e=>e.t.toLowerCase()===s).map(e=>({e}));
+  const ix=I.filter(x=>(x.n+' '+x.p+' '+x.k[2]+' '+catName[x.c]).toLowerCase().includes(s)).map(x=>({x}));
+  const et=ETFS.filter(e=>e.t.toLowerCase()!==s&&(e.t.toLowerCase().startsWith(s)||e.n.toLowerCase().includes(s))).map(e=>({e}));
+  return ex.concat(ix,et).slice(0,12)}
+function drawRes(){
+  if(!q.value.trim()){closeRes();return}
+  res.hidden=false;
+  if(!hits.length){res.innerHTML='<p class="none">No match. Try a ticker like VOO or a provider like MSCI.</p>';return}
+  res.innerHTML=hits.map((h,i)=>{const id=h.x?h.x.id:h.e.x.id;
+    return '<button type="button" data-id="'+id+'" class="'+(i===sel?'on':'')+'">'+(h.x?'<b>'+esc(h.x.n)+'</b>':'<b>'+esc(h.e.t)+'</b> '+esc(h.e.n))+'<small>'+(h.x?esc(h.x.p)+', '+esc(catName[h.x.c]):'Tracks '+esc(h.e.x.n))+'</small></button>'}).join('')}
+q.addEventListener('input',()=>{hits=find(q.value);sel=hits.length?0:-1;drawRes()});
+q.addEventListener('keydown',ev=>{
+  if(ev.key==='ArrowDown'&&hits.length){ev.preventDefault();sel=(sel+1)%hits.length;drawRes()}
+  else if(ev.key==='ArrowUp'&&hits.length){ev.preventDefault();sel=(sel-1+hits.length)%hits.length;drawRes()}
+  else if(ev.key==='Enter'&&hits.length){ev.preventDefault();const h=hits[Math.max(sel,0)];q.value='';closeRes();q.blur();go(h.x?h.x.id:h.e.x.id)}
+  else if(ev.key==='Escape')closeRes()});
+
+apply();
+}
+</script>
+</body>
+</html>

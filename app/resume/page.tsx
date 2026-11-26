@@ -34,6 +34,7 @@ export default function Resume() {
             <a href="/" className="hover:text-fx-orange transition-colors">About</a>
             <a href="/writing" className="hover:text-fx-orange transition-colors">Writing</a>
             <a href="/bookshelf" className="hover:text-fx-orange transition-colors">Bookshelf</a>
+            <a href="/etf-atlas.html" className="hover:text-fx-orange transition-colors">ETF Atlas</a>
           </nav>
         </header>
 
