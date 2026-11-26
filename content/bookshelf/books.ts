@@ -13,4 +13,8 @@ export const books: Book[] = [
     title: 'Misbehaving: The Making of Behavioral Economics: Richard H. Thaler',
     slug: 'misbehaving',
   },
+  {
+    title: 'Nudge: Improving Decisions About Health, Wealth, and Happiness: Richard H. Thaler and Cass R. Sunstein',
+    slug: 'nudge',
+  },
 ]

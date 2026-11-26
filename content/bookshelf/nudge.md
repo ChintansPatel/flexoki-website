@@ -1,0 +1,3 @@
+Nudge explains how the way choices are presented, which Richard H. Thaler and Cass R. Sunstein call "choice architecture," shapes the decisions people make. Defaults, the order of options, and simple framing can push behavior in a direction without taking away anyone's freedom to choose. The authors call this approach libertarian paternalism.
+
+I read this book alongside Misbehaving to deepen my understanding of behavioral finance. The retirement savings examples stood out most, especially automatic enrollment and Save More Tomorrow, which show how small design changes can greatly improve long-term financial outcomes. It changed how I think about designing financial products and institutions: they should make the good choice the easy choice.
